@@ -26,10 +26,9 @@ namespace Artifacts.Bot
         public List<Objet> ObjetList { get; private set; }
 
         private List<WorkOrder> ListeWorkorderAttenteRessource = new List<WorkOrder>();
-        private List<WorkOrder> ListeWorkorderAttenteCraft = new List<WorkOrder>();
-        //private List<Tuple<string, int>> ListeDesResources = new List<Tuple<string, int>>(); //contient le code du drop à utiliser dans GetAllResources et la quantité requise
+        private WorkOrder WorkorderAttenteCraft = null;
+        public List<Tuple<string, int>> ListeDesResourcesPourTousLesCrafts = new List<Tuple<string, int>>(); //code,quantité
         private ConsoleColor originalConsoleColor = Console.ForegroundColor;
-        private List<Tuple<string, int>> ItemsDeEquipe = new List<Tuple<string, int>>(); //code, quantité
 
         public void endMCU()
         {
@@ -80,10 +79,6 @@ namespace Artifacts.Bot
             ChargerBanque();
             ConsoleManager.Write("");
 
-            ConsoleManager.Write("Création de la liste ItemsDeEquipe");
-            ChargerItemsDeEquipe();
-            ConsoleManager.Write("");
-
             ConsoleManager.Write("Récupération de la carte");
             AllMapResponse allMapResponse = MapsEndPoint.GetAllMaps(string.Empty, string.Empty, 1, 100);
             Map = allMapResponse.data;
@@ -119,6 +114,13 @@ namespace Artifacts.Bot
                 ResourceList.AddRange(ResourcesEndPoint.GetAllResources(null, null, null, null, i, 100).data);
             }
             ConsoleManager.Write("");
+
+
+            WorkOrder wo = new WorkOrder();
+            wo.Quantité = 10;
+            wo.Demandeur = ListePersonnages.First();
+            wo.Code = "cooked_chicken";
+            ListeWorkorderAttenteRessource.Add(wo);
         }
 
         private void ChargerBanque()
@@ -142,12 +144,6 @@ namespace Artifacts.Bot
         {
 
             ConsoleManager.Write("RUNNING !");
-            WorkOrder WorkOrderEnCoursdeCollecte = null;
-            WorkOrder wo = new WorkOrder();
-            wo.Quantité = 10;
-            wo.Demandeur = ListePersonnages.First();
-            wo.Code = "cooked_chicken";
-            ListeWorkorderAttenteRessource.Add(wo);
 
             foreach (Personnage.Personnage p in ListePersonnages)
             {
@@ -157,16 +153,63 @@ namespace Artifacts.Bot
             }
             while (!Stop)
             {
-                //Dummy test
-                /*List<Tuple<string,int>> lt = DecomposerObjet("feather_coat", 1);
-                Tuple<string, int> feather = new Tuple<string, int>("feather", 10);
-                ItemsDeEquipe.Add(feather);
-                Tuple<string, int> gold = new Tuple<string, int>("gold", 1);
-                ItemsDeEquipe.Add(gold);
-                List<Tuple<string, int>> lt2 = GenererListeDesDrops("feather_coat", 1, ItemsDeEquipe);
-                bool b = isCraftable(lt2);*/
-                
-                if (WorkOrderEnCoursdeCollecte == null)
+                List<Tuple<string, int>> listeGlobaleResources = new List<Tuple<string, int>>();
+                foreach (WorkOrder wo in ListeWorkorderAttenteRessource)
+                {
+                    List<Tuple<string, int>> resources_du_workorder = GenererListeDesDrops(wo.Code, wo.Quantité, CalculerItemsDeEquipeSaufCrafteur());
+                    foreach(Tuple<string, int> t in resources_du_workorder)
+                    {
+                        if(listeGlobaleResources.Where(x => x.Item1 == t.Item1).Any())
+                        {
+                            Tuple<string,int> tupleResourceExistant = listeGlobaleResources.Where(x => x.Item1 == t.Item1).First();
+                            Tuple<string, int> nouveauTuple = new Tuple<string, int>(t.Item1, t.Item2 + tupleResourceExistant.Item2);
+                            listeGlobaleResources.Remove(tupleResourceExistant);
+                            listeGlobaleResources.Add(nouveauTuple);
+                        }
+                    }
+                }
+                lock(ListeDesResourcesPourTousLesCrafts)
+                {
+                    ListeDesResourcesPourTousLesCrafts = listeGlobaleResources;
+                }
+
+                if (WorkorderAttenteCraft == null)
+                {
+                    //maintenant on regarde si un WorkOrder est craftable ==> sa liste est vide
+                    foreach (WorkOrder wo in ListeWorkorderAttenteRessource)
+                    {
+                        if (GenererListeDesDrops(wo.Code,wo.Quantité,CalculerItemsDeEquipeSaufCrafteur()).Count == 0)
+                        {
+                            foreach(Personnage.Personnage p in ListePersonnages)
+                            {
+                                if (p.GetType() != typeof(Crafteur))
+                                {
+                                    p.doitViderEnBanque = true; //Todo : optimiser pour ne laisser que ceux qui ont du stuff utile pour le craft
+                                }
+                            }
+                            lock( ListeWorkorderAttenteRessource)
+                            {
+                                ListeWorkorderAttenteRessource.Remove(wo);
+                            }
+
+                            WorkorderAttenteCraft = wo; break;
+                        }
+                    }
+                }
+                else
+                {
+                    if (ToutEstEnBanque(WorkorderAttenteCraft))
+                    {
+                        Crafteur crafteur = (Crafteur)ListePersonnages.Where(x => x.GetType() ==  typeof(Crafteur) ).FirstOrDefault();
+                        if (crafteur != null)
+                        {
+                            crafteur.CrafterWorkOrder = true;
+                        }
+                    }
+                }
+
+                //code mort
+                /*if (WorkOrderEnCoursdeCollecte == null)
                 {
                     int i = 0;
                     while (WorkOrderEnCoursdeCollecte == null && i < ListeWorkorderAttenteRessource.Count)
@@ -206,7 +249,7 @@ namespace Artifacts.Bot
                             WorkOrderEnCoursdeCollecte = null;
                         }
                     }
-                }
+                }*/
                 
             }
         }
@@ -272,11 +315,6 @@ namespace Artifacts.Bot
             }
         }
 
-        public List<Tuple<string,int>> GetItemsDeEquipe()
-        {
-            return ItemsDeEquipe;
-        }
-
         private List<Tuple<string, int>> DecomposerObjet(string objetCode, int quantite)
         {
             List<Tuple<string, int>> liste = new List<Tuple<string, int>>();
@@ -320,7 +358,7 @@ namespace Artifacts.Bot
             return liste_triee;
         }
 
-        public bool isCraftable(List<Tuple<string, int>> listeDrops)
+        /*public bool isCraftable(List<Tuple<string, int>> listeDrops)
         {
             bool craftable = true;
 
@@ -372,7 +410,7 @@ namespace Artifacts.Bot
             }
 
             return craftable;
-        }
+        }*/
 
         public List<string> CSPCombat(Personnage.Personnage p, Monster m)
         {
@@ -527,7 +565,7 @@ namespace Artifacts.Bot
         {
             Character c = MyCharactersEndPoint.DepositBank(name, code, quantity);
             ChargerBanque();
-            ChargerItemsDeEquipe();
+            CalculerItemsDeEquipeSaufCrafteur();
             return c;
         }
 
@@ -535,7 +573,7 @@ namespace Artifacts.Bot
         {
             Character c = MyCharactersEndPoint.WithdrawBank(name,code, quantite);
             ChargerBanque();
-            ChargerItemsDeEquipe();
+            CalculerItemsDeEquipeSaufCrafteur();
             return c;
         }
 
@@ -544,32 +582,17 @@ namespace Artifacts.Bot
             lock (ListeWorkorderAttenteRessource)
             {
                 ListeWorkorderAttenteRessource.Add(workOrder);
-                foreach (Personnage.Personnage p in ListePersonnages)
-                {
-                    p.NouveauWorkOrder = true;
-                }
             }
         }
 
-        public void SupprimerCommandeLivree(WorkOrder wo)
-        {
-            lock (ListeWorkorderAttenteRessource)
-            {
-                ListeWorkorderAttenteCraft.Remove(wo);
-            }
-        }
 
-        public void ActualiserResources()
+        private List<Tuple<string, int>> CalculerItemsDeEquipeSaufCrafteur()
         {
-            ChargerItemsDeEquipe();
-        }
-
-        private void ChargerItemsDeEquipe()
-        {
-            lock(ItemsDeEquipe)
+            List<Tuple<string, int>> ItemsDeEquipe = new List<Tuple<string, int>>();
+            ItemsDeEquipe.Clear();
+            foreach (Personnage.Personnage p in ListePersonnages)
             {
-                ItemsDeEquipe.Clear();
-                foreach (Personnage.Personnage p in ListePersonnages)
+                if (p.GetType() != typeof(Crafteur))
                 {
                     foreach (Inventory inventory in p.FeuillePerso.inventory)
                     {
@@ -577,15 +600,13 @@ namespace Artifacts.Bot
                         ItemsDeEquipe.Add(t);
                     }
                 }
-                lock(BankItemList)
-                {
-                    foreach(Item item in BankItemList)
-                    {
-                        Tuple<string, int> t = new Tuple<string, int>(item.code, Int32.Parse(item.quantity));
-                        ItemsDeEquipe.Add(t);
-                    }
-                }
             }
+            foreach(Item item in ConsulterBanque())
+            {
+                Tuple<string, int> t = new Tuple<string, int>(item.code, Int32.Parse(item.quantity));
+                ItemsDeEquipe.Add(t);
+            }
+            return ItemsDeEquipe;
         }
     }
 }

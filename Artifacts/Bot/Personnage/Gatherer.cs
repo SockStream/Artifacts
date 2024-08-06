@@ -119,7 +119,6 @@ namespace Artifacts.Bot.Personnage
                     {
                         NiveauMetierGagne = true;
                     }
-                    mcu.ActualiserResources();
                 }
                 else
                 {
