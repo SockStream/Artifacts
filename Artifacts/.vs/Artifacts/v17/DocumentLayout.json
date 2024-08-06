@@ -1,0 +1,150 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Git\\Artifacts\\Artifacts\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|c:\\git\\artifacts\\artifacts\\bot\\personnage\\gatherer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|solutionrelative:bot\\personnage\\gatherer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|c:\\git\\artifacts\\artifacts\\bot\\personnage\\personnage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|solutionrelative:bot\\personnage\\personnage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|c:\\git\\artifacts\\artifacts\\mycharacters\\mycharactersendpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|solutionrelative:mycharacters\\mycharactersendpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|c:\\git\\artifacts\\artifacts\\utilities\\consolemanager\\consolemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|solutionrelative:utilities\\consolemanager\\consolemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|c:\\git\\artifacts\\artifacts\\bot\\mcu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|solutionrelative:bot\\mcu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|c:\\git\\artifacts\\artifacts\\bot\\personnage\\guerrier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|solutionrelative:bot\\personnage\\guerrier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|c:\\git\\artifacts\\artifacts\\bot\\csp_fight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|solutionrelative:bot\\csp_fight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|c:\\git\\artifacts\\artifacts\\utilities\\network\\querysender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE651A40-20BC-4A88-BFC9-7284FE981419}|Artifacts.csproj|solutionrelative:utilities\\network\\querysender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MyCharactersEndPoint.cs",
+              "DocumentMoniker": "C:\\Git\\Artifacts\\Artifacts\\MyCharacters\\MyCharactersEndPoint.cs",
+              "RelativeDocumentMoniker": "MyCharacters\\MyCharactersEndPoint.cs",
+              "ToolTip": "C:\\Git\\Artifacts\\Artifacts\\MyCharacters\\MyCharactersEndPoint.cs",
+              "RelativeToolTip": "MyCharacters\\MyCharactersEndPoint.cs",
+              "ViewState": "AQIAADAAAAAAAAAAAAAqwF4AAAAQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-05T17:09:34.26Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ConsoleManager.cs",
+              "DocumentMoniker": "C:\\Git\\Artifacts\\Artifacts\\Utilities\\ConsoleManager\\ConsoleManager.cs",
+              "RelativeDocumentMoniker": "Utilities\\ConsoleManager\\ConsoleManager.cs",
+              "ToolTip": "C:\\Git\\Artifacts\\Artifacts\\Utilities\\ConsoleManager\\ConsoleManager.cs",
+              "RelativeToolTip": "Utilities\\ConsoleManager\\ConsoleManager.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-05T17:07:44.7Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Guerrier.cs",
+              "DocumentMoniker": "C:\\Git\\Artifacts\\Artifacts\\Bot\\Personnage\\Guerrier.cs",
+              "RelativeDocumentMoniker": "Bot\\Personnage\\Guerrier.cs",
+              "ToolTip": "C:\\Git\\Artifacts\\Artifacts\\Bot\\Personnage\\Guerrier.cs",
+              "RelativeToolTip": "Bot\\Personnage\\Guerrier.cs",
+              "ViewState": "AQIAAGoAAAAAAAAAAAAAwIgAAAAhAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-05T15:16:04.348Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "QuerySender.cs",
+              "DocumentMoniker": "C:\\Git\\Artifacts\\Artifacts\\Utilities\\Network\\QuerySender.cs",
+              "RelativeDocumentMoniker": "Utilities\\Network\\QuerySender.cs",
+              "ToolTip": "C:\\Git\\Artifacts\\Artifacts\\Utilities\\Network\\QuerySender.cs",
+              "RelativeToolTip": "Utilities\\Network\\QuerySender.cs",
+              "ViewState": "AQIAADUAAAAAAAAAAAAAAEgAAAAQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-05T15:16:04.405Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Personnage.cs",
+              "DocumentMoniker": "C:\\Git\\Artifacts\\Artifacts\\Bot\\Personnage\\Personnage.cs",
+              "RelativeDocumentMoniker": "Bot\\Personnage\\Personnage.cs",
+              "ToolTip": "C:\\Git\\Artifacts\\Artifacts\\Bot\\Personnage\\Personnage.cs",
+              "RelativeToolTip": "Bot\\Personnage\\Personnage.cs",
+              "ViewState": "AQIAALEAAAAAAAAAAAAQwDkBAAAfAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-05T14:38:10.953Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "CSP_Fight.cs",
+              "DocumentMoniker": "C:\\Git\\Artifacts\\Artifacts\\Bot\\CSP_Fight.cs",
+              "RelativeDocumentMoniker": "Bot\\CSP_Fight.cs",
+              "ToolTip": "C:\\Git\\Artifacts\\Artifacts\\Bot\\CSP_Fight.cs",
+              "RelativeToolTip": "Bot\\CSP_Fight.cs",
+              "ViewState": "AQIAAGQBAAAAAAAAAAAQwHUBAAAYAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-05T12:31:21.221Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Gatherer.cs",
+              "DocumentMoniker": "C:\\Git\\Artifacts\\Artifacts\\Bot\\Personnage\\Gatherer.cs",
+              "RelativeDocumentMoniker": "Bot\\Personnage\\Gatherer.cs",
+              "ToolTip": "C:\\Git\\Artifacts\\Artifacts\\Bot\\Personnage\\Gatherer.cs",
+              "RelativeToolTip": "Bot\\Personnage\\Gatherer.cs",
+              "ViewState": "AQIAAD4AAAAAAAAAAAAQwE8AAAAYAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-05T11:00:26.232Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MCU.cs",
+              "DocumentMoniker": "C:\\Git\\Artifacts\\Artifacts\\Bot\\MCU.cs",
+              "RelativeDocumentMoniker": "Bot\\MCU.cs",
+              "ToolTip": "C:\\Git\\Artifacts\\Artifacts\\Bot\\MCU.cs",
+              "RelativeToolTip": "Bot\\MCU.cs",
+              "ViewState": "AQIAACkAAAAAAAAAAAAuwDsAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-05T10:55:35.138Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

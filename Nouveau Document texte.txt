@@ -1,0 +1,66 @@
+https://learn.microsoft.com/fr-fr/dotnet/csharp/language-reference/statements/lock
+
+
+
+
+
+
+prio 1 pour tous : si j’ai reçu une commande que je peux satisfaire, je la fait
+//si je suis le guerrier, je n’utilise pas de conso
+
+Guerrier
+//s’il y a un évent et que je peux tuer les mobs, je fonce
+//si j’ai une commande mais que les mobs ne sont pas sur la map, je ne dois pas en tenir compte => la commande doit pouvoir être suspendue
+//veut se battre contre les monstres les plus fort possibles et ceux qu’il n’a pas encore combattu (prio si “égalité”)
+	il doit calculer l’issue des combats avant de se battre
+	il va combattre ce qu’il peut tuer au meilleur niveau possible, même s’il faut passer une commande d’arme, d’armure, de bouffe… (dans la limite de ce que je peux utiliser en fct de mon niveau)
+
+	
+il faut que la commande passe par le crafteur
+s’il n’y a pas les compos, il passe la commande aux gathereurs
+on passe une commande pour un slot, et on ne passe plus de commande en rapport avec  
+
+
+Gathereur (mineur, bucheron, pécheur)
+//But : On veut améliorer la compétence minage au max
+
+//si mon inventaire est plein, je vais tout poser en banque
+//si je peux avoir une “arme” d’un meilleur niveau que ce que j’ai d’équipé, alors je passe une commande => et il faut que j’évite de spammer comme un mongol
+//si on me passe une commande et que je peux y répondre
+et que j’ai la place pour la ressource
+, alors, si c’est pas en banque, je vais le récupérer
+si j’ai pas la place
+	alors je vais poser mes ressources en banque
+//on va farmer la meilleure ressource possible à son niveau jusqu’à être plein
+
+
+
+crafteurs (weapon, gear, jewelry, cooking)
+il veut toujours craft les objets de son niveau qu’il n’a pas encore craft => ça lui permet de savoir quel XP est récupéré par craft d’objet
+Pour ça, il va passer des commandes. le guerrier va peut être lui demander un craft de nourriture
+s’il peut créer un set pour le guerrier qu’il n’a pas encore, il le craft => le guerrier ira le récupérer, et posera son ancien set en banque si celui créé est du même type en mieux
+ensuite, il va chercher à monter ses skill
+pour ça, il va calculer cb de ressources il a besoin pour tout monter d’un niveau et il passe une commande de masse.
+ensuite il attends d’avoir la commande et craft le tout
+une fois que j’ai passé mon niveau, je reset mes connaissances sur l’XP généré
+//si une commande passée est suspendue il faut que je fasse autre chose
+
+
+prio des commandes
+=> on traite en priorité les commandes de plus bas niveau de craft
+et si égalité
+1/ gatherer
+2/ guerrier
+3/ crafteur
+
+
+
+
+
+1 guerrier
+1 pécheur
+1 mineur
+1 bucheron
+1 ??? (vendeur ?)
+
+
