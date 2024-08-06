@@ -109,20 +109,17 @@ namespace Artifacts.Bot.Personnage
                 {
                     //aller sur la bonne tuile
                     AllerSurTuile(resourceARecuperer);
-                    while (wo_pris.ListeDesResources.Where(x => x.Item1 == resourceARecuperer.code).Count() > 0)
+                    int niveau_actuel = GetNiveauMetier();
+                    Character c = MyCharactersEndPoint.Gathering(FeuillePerso.name);
+                    if (c != null)
                     {
-                        int niveau_actuel = GetNiveauMetier();
-                        Character c = MyCharactersEndPoint.Gathering(FeuillePerso.name);
-                        if (c != null)
-                        {
-                            FeuillePerso = c;
-                        }
-                        if (GetNiveauMetier() != niveau_actuel)
-                        {
-                            NiveauMetierGagne = true;
-                        }
-                        mcu.ActualiserResources();
+                        FeuillePerso = c;
                     }
+                    if (GetNiveauMetier() != niveau_actuel)
+                    {
+                        NiveauMetierGagne = true;
+                    }
+                    mcu.ActualiserResources();
                 }
                 else
                 {

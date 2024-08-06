@@ -144,7 +144,7 @@ namespace Artifacts.Bot
             ConsoleManager.Write("RUNNING !");
             WorkOrder WorkOrderEnCoursdeCollecte = null;
             WorkOrder wo = new WorkOrder();
-            wo.Quantité = 100;
+            wo.Quantité = 10;
             wo.Demandeur = ListePersonnages.First();
             wo.Code = "cooked_chicken";
             ListeWorkorderAttenteRessource.Add(wo);
@@ -240,33 +240,36 @@ namespace Artifacts.Bot
 
         public List<Tuple<string, int>> GenererListeDesDrops(string codeItem,int quantite, List<Tuple<string, int>> _ItemsDeEquipe)
         {
-            List<Tuple<string,int>> listeDesResources = new List<Tuple<string,int>>();
-            Objet objet = ObjetList.Where(x => x.code.Equals(codeItem)).FirstOrDefault();
-            foreach (Item item in objet.craft.items)
+            lock (_ItemsDeEquipe)
             {
-                Tuple<string, int> itemDeEquipe = _ItemsDeEquipe.Where(x => x.Item1.Equals(item.code)).FirstOrDefault();
-                int nb_existant = 0;
-                if (itemDeEquipe != null)
+                List<Tuple<string, int>> listeDesResources = new List<Tuple<string, int>>();
+                Objet objet = ObjetList.Where(x => x.code.Equals(codeItem)).FirstOrDefault();
+                foreach (Item item in objet.craft.items)
                 {
-                    nb_existant = itemDeEquipe.Item2;
-                }
-                int NbRequises = Math.Max(0, Int32.Parse(item.quantity) - nb_existant);
-                if (NbRequises > 0)
-                {
-                    //maintenant on doit regarder si c'est une ressource, un drop ou un Objet
-                    Objet obj = ObjetList.Where(x => x.code.Equals(item.code)).First();
-                    if (obj.type == "resource")
+                    Tuple<string, int> itemDeEquipe = _ItemsDeEquipe.Where(x => x.Item1.Equals(item.code)).FirstOrDefault();
+                    int nb_existant = 0;
+                    if (itemDeEquipe != null)
                     {
-                        listeDesResources.Add(new Tuple<string, int>(item.code, NbRequises * quantite));
+                        nb_existant = itemDeEquipe.Item2;
                     }
-                    else
+                    int NbRequises = Math.Max(0, Int32.Parse(item.quantity) - nb_existant);
+                    if (NbRequises > 0)
                     {
-                        listeDesResources.AddRange(DecomposerObjet(item.code, NbRequises * quantite));
+                        //maintenant on doit regarder si c'est une ressource, un drop ou un Objet
+                        Objet obj = ObjetList.Where(x => x.code.Equals(item.code)).First();
+                        if (obj.type == "resource")
+                        {
+                            listeDesResources.Add(new Tuple<string, int>(item.code, NbRequises * quantite));
+                        }
+                        else
+                        {
+                            listeDesResources.AddRange(DecomposerObjet(item.code, NbRequises * quantite));
+                        }
                     }
                 }
-            }
 
-            return listeDesResources;
+                return listeDesResources;
+            }
         }
 
         public List<Tuple<string,int>> GetItemsDeEquipe()

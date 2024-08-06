@@ -143,12 +143,16 @@ namespace Artifacts.Bot.Personnage
 
         internal void Retirer_Banque(string code, int quantity)
         {
-
+            throw new NotImplementedException();
         }
 
         internal void AllerSurTuileMonstre(Monster monstre)
         {
             Maps.Tile tuile = mcu.Map.Where(x => x.content != null && x.content.type == "monster" && x.content.code == monstre.code).First();
+            if (FeuillePerso.x == tuile.x && FeuillePerso.y == tuile.y)
+            {
+                return;
+            }
             Character c = MyCharactersEndPoint.Move(FeuillePerso.name, tuile.x, tuile.y);
             if (c != null)
             {
@@ -321,7 +325,7 @@ namespace Artifacts.Bot.Personnage
                 }
             }
 
-            if (!String.IsNullOrEmpty(FeuillePerso.ring1_slot))
+            if (!String.IsNullOrEmpty(FeuillePerso.ring2_slot))
             {
                 c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "ring2_slot");
                 if (c != null)
@@ -352,20 +356,29 @@ namespace Artifacts.Bot.Personnage
 
         internal void RetirerArtefacts()
         {
-            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact1_slot");
-            if (c != null)
+            if (!String.IsNullOrEmpty(FeuillePerso.artifact1_slot))
             {
-                FeuillePerso = c;
+                Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact1_slot");
+                if (c != null)
+                {
+                    FeuillePerso = c;
+                }
             }
-            c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact2_slot");
-            if (c != null)
+            if (!String.IsNullOrEmpty(FeuillePerso.artifact2_slot))
             {
-                FeuillePerso = c;
+                Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact2_slot");
+                if (c != null)
+                {
+                    FeuillePerso = c;
+                }
             }
-            c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact3_slot");
-            if (c != null)
+            if (!String.IsNullOrEmpty(FeuillePerso.artifact3_slot))
             {
-                FeuillePerso = c;
+                Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact3_slot");
+                if (c != null)
+                {
+                    FeuillePerso = c;
+                }
             }
         }
         internal void EquiperArtefact(string code)

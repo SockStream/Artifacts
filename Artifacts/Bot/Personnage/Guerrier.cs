@@ -101,20 +101,17 @@ namespace Artifacts.Bot.Personnage
                     EquiperStuff(stuffAEquiper);
                     //aller sur la bonne tuile
                     AllerSurTuileMonstre(monstreATuer);
-                    while (wo_pris.ListeDesResources.Where(x => x.Item1 == monstreATuer.code).Count() > 0)
+                    int niveau_actuel = FeuillePerso.level;
+                    Character c = MyCharactersEndPoint.Fight(FeuillePerso.name);
+                    if (c != null)
                     {
-                        int niveau_actuel = FeuillePerso.level;
-                        Character c = MyCharactersEndPoint.Fight(FeuillePerso.name);
-                        if (c != null)
-                        {
-                            FeuillePerso = c;
-                        }
-                        if (FeuillePerso.level != niveau_actuel)
-                        {
-                            NiveauMetierGagne = true;
-                        }
-                        mcu.ActualiserResources();
+                        FeuillePerso = c;
                     }
+                    if (FeuillePerso.level != niveau_actuel)
+                    {
+                        NiveauMetierGagne = true;
+                    }
+                    mcu.ActualiserResources();
                 }
                 else
                 {
