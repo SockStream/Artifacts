@@ -11,13 +11,15 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("Artifacts")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("ArtifactsUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c1a50a76aff1f6782ed36ef230a41bee7d6ee4d4")]
-[assembly: System.Reflection.AssemblyProductAttribute("Artifacts")]
-[assembly: System.Reflection.AssemblyTitleAttribute("Artifacts")]
+[assembly: System.Reflection.AssemblyProductAttribute("ArtifactsUI")]
+[assembly: System.Reflection.AssemblyTitleAttribute("ArtifactsUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
+[assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]
 
 // Généré par la classe MSBuild WriteCodeFragment.
 

@@ -45,6 +45,7 @@ namespace Artifacts.Bot.Personnage
                     if (wo.Demandeur.GetType() != typeof(Crafteur))
                     {
                         wo.Demandeur.CommandeEnAttente = true;
+
                     }
                     else
                     {
@@ -178,7 +179,7 @@ namespace Artifacts.Bot.Personnage
             if (commande != null)
             {
                 WorkOrder wo = new WorkOrder();
-                wo.Quantité = 1;
+                wo.Quantité = 10;
                 wo.Demandeur = this;
                 wo.Code = commande.code;
                 mcu.AjouterWorkOrder(wo);

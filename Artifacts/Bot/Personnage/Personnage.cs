@@ -72,10 +72,6 @@ namespace Artifacts.Bot.Personnage
         }
         internal void FarmerMeilleureRessource(string metier)
         {
-            if (GetNiveauMetier() == 10)
-            {
-                Console.WriteLine("youpi !");
-            }
             int niveauMetier_actuel = GetNiveauMetier();
             //on cherche la meilleure ressource associée à notre métier, on se déplace sur la case si on est pas déjà dessus, et on fait 1 Gather
             Resource meilleureResource = mcu.GetResourceList().Where(x => x.skill == metier && x.level <= niveauMetier_actuel).OrderByDescending(x => x.level).FirstOrDefault();

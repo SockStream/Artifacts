@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using Artifacts.Items;
@@ -119,9 +120,21 @@ namespace Artifacts.Bot.Personnage
                         {
                             if (objet.craft.skill == metier && objet.craft.level <= GetNiveauMetier()) //je peux le crafter
                             {
-                                CrafterObjet(t.Item1, t.Item2);
-                                Aller_Banque();
-                                Vider_Inventaire();
+                                int nombre_de_fournées = (int)t.Item2 / 10;
+                                int restant = t.Item2 % 10;
+                                for(int i = 0; i < nombre_de_fournées; i++)
+                                {
+                                    CrafterObjet(t.Item1, 10);
+                                    Aller_Banque();
+                                    Vider_Inventaire();
+                                }
+                                if (restant != 0)
+                                {
+                                    CrafterObjet(t.Item1, restant);
+                                    Aller_Banque();
+                                    Vider_Inventaire();
+                                }
+
                                 action_faite = true;
                             }
                         }
@@ -177,14 +190,16 @@ namespace Artifacts.Bot.Personnage
                 AllerSurTuile(resource);
                 int niveauMetier_actuel = GetNiveauMetier();
                 int nvelleQuantite = quantiteDansSac;
-                while (nvelleQuantite + quantiteEnBanque < quantite)
+                while ((nvelleQuantite + quantiteEnBanque < quantite) &&!termine)
                 {
                     Character c = MyCharactersEndPoint.Gathering(FeuillePerso.name);
                     if (c != null)
                     {
                         FeuillePerso = c;
                     }
+
                     nvelleQuantite = FeuillePerso.inventory.Where(x => x.code == code).First().quantity;
+                    
                     objetEnBanque = mcu.ConsulterBanque().Where(x => x.code == code).FirstOrDefault();
                     quantiteEnBanque = 0;
                     if (objetEnBanque != null)
@@ -211,6 +226,10 @@ namespace Artifacts.Bot.Personnage
                     {
                         int quantite_requise = Int32.Parse(item.quantity) * quantite - NombreDansInventaire(item.code);
                         CrafterObjet(item.code, quantite_requise);
+                        if (termine)
+                        {
+                            return;
+                        }
                     }
                 }
             }

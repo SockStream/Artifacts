@@ -51,7 +51,7 @@ namespace Artifacts.Bot.Personnage
                     List<WorkOrder> recupere = RecupererCommande();
                     foreach (WorkOrder wo in recupere)
                     {
-                        Objet obj = mcu.getObjetList().Where(x => x.code == wo.Code).FirstOrDefault();
+                        /*Objet obj = mcu.getObjetList().Where(x => x.code == wo.Code).FirstOrDefault();
                         if (obj == null)
                         {
                             throw new Exception("should not happen");
@@ -95,7 +95,7 @@ namespace Artifacts.Bot.Personnage
                         {
                             RetirerAnneaux();
                             EquiperAnneau(obj.code);
-                        }
+                        }*/
                     }
                     CommandeEnAttente = false;
                 }
@@ -251,16 +251,22 @@ namespace Artifacts.Bot.Personnage
                         //si je ne la porte pas 
                         if (FeuillePerso.weapon_slot != piece)
                         {
-                            RetirerWeapon(); // retire l'amulette si j'en ai une
+                            if (FeuillePerso.weapon_slot != piece)
+                            {
+                                RetirerWeapon(); // retire l'amulette si j'en ai une
+                            }
                             //si elle est dans mon inventaire
-                            if (!ExistsInInventory(piece))
+                            if (!ExistsInInventory(piece) && FeuillePerso.weapon_slot != piece)
                             {
                                 //je vais la récupérer à la banque
                                 Aller_Banque();
                                 mcu.RecupererDeBanque(FeuillePerso.name,piece, 1);
                             }
-                            //je mets la pièce depuis mon inventaire
-                            EquiperWeapon(piece);
+                            if (FeuillePerso.weapon_slot != piece)
+                            {
+                                //je mets la pièce depuis mon inventaire
+                                EquiperWeapon(piece);
+                            }
                         }
                     }
                     if (objet.type == Constantes.leg_armor)
@@ -300,7 +306,7 @@ namespace Artifacts.Bot.Personnage
                     if (objet.type == Constantes.boots)
                     {
                         //si je ne la porte pas 
-                        if (FeuillePerso.helmet_slot != piece)
+                        if (FeuillePerso.boots_slot != piece)
                         {
                             RetirerBoots(); // retire l'amulette si j'en ai une
                             //si elle est dans mon inventaire
@@ -317,7 +323,7 @@ namespace Artifacts.Bot.Personnage
                     if (objet.type == Constantes.shield)
                     {
                         //si je ne la porte pas 
-                        if (FeuillePerso.helmet_slot != piece)
+                        if (FeuillePerso.shield_slot != piece)
                         {
                             RetirerShield(); // retire l'amulette si j'en ai une
                             //si elle est dans mon inventaire

@@ -166,7 +166,7 @@ namespace Artifacts.Bot
 
             foreach (Personnage.Personnage p in ListePersonnages)
             {
-                p.doitViderEnBanque = true;
+                //p.doitViderEnBanque = true;
                 Thread t = new Thread(p.QueFaire);
                 t.Name = p.FeuillePerso.name;
                 t.Start();
@@ -244,6 +244,7 @@ namespace Artifacts.Bot
                             lock( ListeWorkorderAttenteRessource)
                             {
                                 ListeWorkorderAttenteRessource.Remove(wo);
+                                this.ListeWorkorderAttenteRessource = ListeWorkorderAttenteRessource;
                             }
 
                             WorkorderAttenteCraft = wo; break;
