@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,11 @@ namespace Artifacts.Utilities
         public static string res_water = "res_water";
         public static string res_earth = "res_earth";
         public static string res_air = "res_air";
-
+        internal static string resource = "resource";
+        internal static string weaponcrafting = "weaponcrafting";
+        internal static string gearcrafting = "gearcrafting";
+        internal static string jewelrycrafting = "jewelrycrafting";
+        internal static string cooking = "cooking";
+        internal static string food = "food";
     }
 }

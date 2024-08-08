@@ -8,6 +8,7 @@ using Decider.Csp.Integer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,10 +39,10 @@ namespace Artifacts.Bot
             var leg_armor = new VariableInteger("leg_armor",-1,-1);
             var boots = new VariableInteger("boots",-1,-1);
             var ring1 = new VariableInteger("ring1", -1, -1);
-            var ring2 = new VariableInteger("ring2", -1, -1);
+            //var ring2 = new VariableInteger("ring2", -1, -1);
             var artifact1 = new VariableInteger("artifact1", -1, -1);
-            var artifact2 = new VariableInteger("artifact2", -1, -1);
-            var artifact3 = new VariableInteger("artifact3", -1, -1);
+            //var artifact2 = new VariableInteger("artifact2", -1, -1); //merde, il faut améliorer pour pouvoir les utiliser
+            //var artifact3 = new VariableInteger("artifact3", -1, -1);
 
             if (liste_arme.Count > 0)
             {
@@ -81,39 +82,65 @@ namespace Artifacts.Bot
             if (liste_Rings.Count > 0)
             {
                 ring1 = new VariableInteger(Constantes.ring1, 0, liste_Rings.Count - 1);
-                ring2 = new VariableInteger(Constantes.ring2, 0, liste_Rings.Count - 1);
+                //ring2 = new VariableInteger(Constantes.ring2, 0, liste_Rings.Count - 1);
             }
             if (liste_Artifacts.Count > 0) //todo : mal géré
             {
                 artifact1 = new VariableInteger(Constantes.artifact1, 0, liste_Artifacts.Count - 1);
-                artifact2 = new VariableInteger(Constantes.artifact2, 0, liste_Artifacts.Count - 1);
-                artifact3 = new VariableInteger(Constantes.artifact3, 0, liste_Artifacts.Count - 1);
+                //artifact2 = new VariableInteger(Constantes.artifact2, 0, liste_Artifacts.Count - 1);
+                //artifact3 = new VariableInteger(Constantes.artifact3, 0, liste_Artifacts.Count - 1);
             }
 
             VariableInteger res = new VariableInteger("resultat", 1, 1);
             var constraints = new List<IConstraint>
             {
-                new ConstraintInteger(Tuable(weapon, helmet, shield, body_armor, amulet, leg_armor, boots, ring1, ring2, artifact1, artifact2, artifact3, liste_arme, liste_helmet, liste_shield, liste_BodyArmor, liste_Amulet, liste_LegArmor, liste_Boots, liste_Rings, liste_Artifacts) == res)
             };
-            var variables = new[] { weapon, helmet, shield, body_armor, amulet, leg_armor, boots, ring1, ring2, artifact1, artifact2, artifact3 };
+            //var variables = new[] { weapon, helmet, shield, body_armor, amulet, leg_armor, boots, ring1, ring2, artifact1, artifact2, artifact3 };
+            var variables = new[] { weapon, helmet, shield, body_armor, amulet, leg_armor, boots, ring1,  artifact1};
             var state = new StateInteger(variables, constraints);
             StateOperationResult searchResult = state.SearchAllSolutions();
-            Console.WriteLine(state.Runtime);
-            Console.WriteLine(state.Solutions.Count);
+            //Console.WriteLine(state.Runtime);
+            //Console.WriteLine(state.Solutions.Count);
             return state.Solutions;
         }
 
-        private ExpressionInteger Tuable(VariableInteger weapon, VariableInteger helmet, VariableInteger shield, VariableInteger body_armor, VariableInteger amulet, VariableInteger leg_armor, VariableInteger boots, VariableInteger ring1, VariableInteger ring2, VariableInteger artifacts1, VariableInteger artifacts2, VariableInteger artifacts3, List<Objet> liste_arme, List<Objet> liste_helmet, List<Objet> liste_shield, List<Objet> liste_BodyArmor, List<Objet> liste_Amulet, List<Objet> liste_LegArmor, List<Objet> liste_Boots, List<Objet> liste_Rings, List<Objet> liste_Artifacts)
+        private bool Tuable(Objet weapon,
+            Objet helmet,
+            Objet shield,
+            Objet body_armor,
+            Objet amulet,
+            Objet leg_armor,
+            Objet boots,
+            Objet ring1,
+            Objet ring2,
+            Objet artifacts1,
+            Objet artifacts2,
+            Objet artifacts3)
         {
             int hp_joueur = p.FeuillePerso.hp;
             int hp_monstre = m.hp;
-            int victoire = 0;
+            bool victoire = false;
             bool finCombat = false;
             int i = 1;
 
             int attaque_feu = 0, attaque_eau = 0, attaque_terre = 0, attaque_air = 0;
             int degat_feu = 0, degat_eau = 0, degat_terre = 0, degat_air = 0;
             int res_feu = 0, res_eau = 0, res_terre = 0, res_air = 0;
+
+            List<Objet> ListeEquipement = new List<Objet>();
+            ListeEquipement.Add(weapon);
+            ListeEquipement.Add(helmet);
+            ListeEquipement.Add(shield);
+            ListeEquipement.Add(body_armor);
+            ListeEquipement.Add(amulet);
+            ListeEquipement.Add(leg_armor);
+            ListeEquipement.Add(boots);
+            ListeEquipement.Add(ring1);
+            ListeEquipement.Add(ring2);
+            ListeEquipement.Add(artifacts1);
+            ListeEquipement.Add(artifacts2);
+            ListeEquipement.Add(artifacts3);
+
 
             Objet conso1 = null, conso2 = null;
 
@@ -143,126 +170,77 @@ namespace Artifacts.Bot
                 }
             }
 
-            List<Objet> ListeEquipement = new List<Objet>();
-            if (weapon.Value >= 0)
-            {
-                ListeEquipement.Add(liste_arme[weapon.Value]);
-            }
-            if (helmet.Value >= 0)
-            {
-                ListeEquipement.Add(liste_helmet[helmet.Value]);
-            }
-            if (shield.Value >= 0)
-            {
-                ListeEquipement.Add(liste_shield[shield.Value]);
-            }
-            if (body_armor.Value >= 0)
-            {
-                ListeEquipement.Add(liste_BodyArmor[body_armor.Value]);
-            }
-            if (amulet.Value >= 0)
-            {
-                ListeEquipement.Add(liste_Amulet[amulet.Value]);
-            }
-            if (leg_armor.Value >= 0)
-            {
-                ListeEquipement.Add(liste_LegArmor[leg_armor.Value]);
-            }
-            if (boots.Value >= 0)
-            {
-                ListeEquipement.Add(liste_Boots[boots.Value]);
-            }
-            if (ring1.Value >= 0)
-            {
-                ListeEquipement.Add(liste_Rings[ring1.Value]);
-            }
-            if (ring2.Value >= 0)
-            {
-                ListeEquipement.Add(liste_Rings[ring2.Value]);
-            }
-            if (artifacts1.Value >= 0)
-            {
-                ListeEquipement.Add(liste_Artifacts[artifacts1.Value]);
-            }
-            if (artifacts2.Value >= 0)
-            {
-                ListeEquipement.Add(liste_Artifacts[artifacts2.Value]);
-            }
-            if (artifacts3.Value >= 0)
-            {
-                ListeEquipement.Add(liste_Artifacts[artifacts3.Value]);
-            }
-
-
-
             foreach(Objet obj in ListeEquipement)
             {
-                #region attaque_types
-                Artifacts.Items.Effect effet_atk_feu = obj.effects.Where(x => x.name == Constantes.attack_fire).FirstOrDefault();
-                if (effet_atk_feu != null)
+                if (obj != null && obj.effects != null)
                 {
-                    attaque_feu += effet_atk_feu.value;
+                    #region attaque_types
+                    Artifacts.Items.Effect effet_atk_feu = obj.effects.Where(x => x.name == Constantes.attack_fire).FirstOrDefault();
+                    if (effet_atk_feu != null)
+                    {
+                        attaque_feu += effet_atk_feu.value;
+                    }
+                    Artifacts.Items.Effect effet_atk_eau = obj.effects.Where(x => x.name == Constantes.attack_water).FirstOrDefault();
+                    if (effet_atk_eau != null)
+                    {
+                        attaque_eau += effet_atk_eau.value;
+                    }
+                    Artifacts.Items.Effect effet_atk_terre = obj.effects.Where(x => x.name == Constantes.attack_earth).FirstOrDefault();
+                    if (effet_atk_terre != null)
+                    {
+                        attaque_terre += effet_atk_terre.value;
+                    }
+                    Artifacts.Items.Effect effet_atk_air = obj.effects.Where(x => x.name == Constantes.attack_air).FirstOrDefault();
+                    if (effet_atk_air != null)
+                    {
+                        attaque_air += effet_atk_air.value;
+                    }
+                    #endregion
+                    #region degats_types
+                    Artifacts.Items.Effect effet_dmg_feu = obj.effects.Where(x => x.name == Constantes.dmg_fire).FirstOrDefault();
+                    if (effet_dmg_feu != null)
+                    {
+                        degat_feu += effet_dmg_feu.value;
+                    }
+                    Artifacts.Items.Effect effet_dmg_eau = obj.effects.Where(x => x.name == Constantes.dmg_water).FirstOrDefault();
+                    if (effet_dmg_eau != null)
+                    {
+                        degat_eau += effet_dmg_eau.value;
+                    }
+                    Artifacts.Items.Effect effet_dmg_terre = obj.effects.Where(x => x.name == Constantes.dmg_earth).FirstOrDefault();
+                    if (effet_dmg_terre != null)
+                    {
+                        degat_terre += effet_dmg_terre.value;
+                    }
+                    Artifacts.Items.Effect effet_dmg_air = obj.effects.Where(x => x.name == Constantes.dmg_air).FirstOrDefault();
+                    if (effet_dmg_air != null)
+                    {
+                        degat_air += effet_dmg_air.value;
+                    }
+                    #endregion
+                    #region res_types
+                    Artifacts.Items.Effect effet_res_feu = obj.effects.Where(x => x.name == Constantes.res_fire).FirstOrDefault();
+                    if (effet_res_feu != null)
+                    {
+                        res_feu += effet_res_feu.value;
+                    }
+                    Artifacts.Items.Effect effet_res_eau = obj.effects.Where(x => x.name == Constantes.res_water).FirstOrDefault();
+                    if (effet_res_eau != null)
+                    {
+                        res_eau += effet_res_eau.value;
+                    }
+                    Artifacts.Items.Effect effet_res_terre = obj.effects.Where(x => x.name == Constantes.res_earth).FirstOrDefault();
+                    if (effet_res_terre != null)
+                    {
+                        res_terre += effet_res_terre.value;
+                    }
+                    Artifacts.Items.Effect effet_res_air = obj.effects.Where(x => x.name == Constantes.res_air).FirstOrDefault();
+                    if (effet_res_air != null)
+                    {
+                        res_air += effet_res_air.value;
+                    }
+                    #endregion
                 }
-                Artifacts.Items.Effect effet_atk_eau = obj.effects.Where(x => x.name == Constantes.attack_water).FirstOrDefault();
-                if (effet_atk_eau != null)
-                {
-                    attaque_eau += effet_atk_eau.value;
-                }
-                Artifacts.Items.Effect effet_atk_terre = obj.effects.Where(x => x.name == Constantes.attack_earth).FirstOrDefault();
-                if (effet_atk_terre != null)
-                {
-                    attaque_terre += effet_atk_terre.value;
-                }
-                Artifacts.Items.Effect effet_atk_air = obj.effects.Where(x => x.name == Constantes.attack_air).FirstOrDefault();
-                if (effet_atk_air != null)
-                {
-                    attaque_air += effet_atk_air.value;
-                }
-                #endregion
-                #region degats_types
-                Artifacts.Items.Effect effet_dmg_feu = obj.effects.Where(x => x.name == Constantes.dmg_fire).FirstOrDefault();
-                if (effet_dmg_feu != null)
-                {
-                    degat_feu += effet_dmg_feu.value;
-                }
-                Artifacts.Items.Effect effet_dmg_eau = obj.effects.Where(x => x.name == Constantes.dmg_water).FirstOrDefault();
-                if (effet_dmg_eau != null)
-                {
-                    degat_eau += effet_dmg_eau.value;
-                }
-                Artifacts.Items.Effect effet_dmg_terre = obj.effects.Where(x => x.name == Constantes.dmg_earth).FirstOrDefault();
-                if (effet_dmg_terre != null)
-                {
-                    degat_terre += effet_dmg_terre.value;
-                }
-                Artifacts.Items.Effect effet_dmg_air = obj.effects.Where(x => x.name == Constantes.dmg_air).FirstOrDefault();
-                if (effet_dmg_air != null)
-                {
-                    degat_air += effet_dmg_air.value;
-                }
-                #endregion
-                #region res_types
-                Artifacts.Items.Effect effet_res_feu = obj.effects.Where(x => x.name == Constantes.res_fire).FirstOrDefault();
-                if (effet_res_feu != null)
-                {
-                    res_feu += effet_res_feu.value;
-                }
-                Artifacts.Items.Effect effet_res_eau = obj.effects.Where(x => x.name == Constantes.res_water).FirstOrDefault();
-                if (effet_res_eau != null)
-                {
-                    res_eau += effet_res_eau.value;
-                }
-                Artifacts.Items.Effect effet_res_terre = obj.effects.Where(x => x.name == Constantes.res_earth).FirstOrDefault();
-                if (effet_res_terre != null)
-                {
-                    res_terre += effet_res_terre.value;
-                }
-                Artifacts.Items.Effect effet_res_air = obj.effects.Where(x => x.name == Constantes.res_air).FirstOrDefault();
-                if (effet_res_air != null)
-                {
-                    res_air += effet_res_air.value;
-                }
-                #endregion
             }
 
             while ( i <= 50 && !finCombat)
@@ -276,16 +254,16 @@ namespace Artifacts.Bot
 
                 if (hp_monstre <= 0)
                 {
-                    victoire = 1;
+                    victoire = true;
                     finCombat = true;
                     continue;
                 }
 
 
-                pv_perdu_feu = (int)(m.attack_fire * (1) * (1 - ((double)res_feu / 100)));
-                pv_perdu_eau = (int)(m.attack_water * (1) * (1 - ((double)res_eau / 100)));
-                pv_perdu_terre = (int)(m.attack_earth * (1) * (1 - ((double)res_terre / 100)));
-                pv_perdu_air = (int)(m.attack_air * (1) * (1 - ((double)res_air / 100)));
+                pv_perdu_feu = (int)Math.Ceiling(m.attack_fire * (1) * (1 - ((double)res_feu / 100)));
+                pv_perdu_eau = (int)Math.Ceiling(m.attack_water * (1) * (1 - ((double)res_eau / 100)));
+                pv_perdu_terre = (int)Math.Ceiling(m.attack_earth * (1) * (1 - ((double)res_terre / 100)));
+                pv_perdu_air = (int)Math.Ceiling(m.attack_air * (1) * (1 - ((double)res_air / 100)));
 
                 hp_joueur = hp_joueur - pv_perdu_feu - pv_perdu_eau - pv_perdu_terre - pv_perdu_air;
 
@@ -293,18 +271,17 @@ namespace Artifacts.Bot
 
                 if (hp_joueur <= 0)
                 {
-                    victoire = 0;
+                    victoire = false;
                     finCombat = true;
                     continue;
                 }
                 i++;
             }
 
-            ExpressionInteger resultat = new ExpressionInteger(victoire);
-            return resultat;
+            return victoire;
         }
 
-        public List<string> GenererListePossibilites(List<Item> Banque)
+        public List<string> GenererListePossibilites()
         {
             List<Objet> liste_arme = new List<Objet>();
             List<Objet> liste_helmet = new List<Objet>();
@@ -315,7 +292,7 @@ namespace Artifacts.Bot
             List<Objet> liste_Boots = new List<Objet>();
             List<Objet> liste_Rings = new List<Objet>();
             List<Objet> liste_Artifacts = new List<Objet>();
-            List<Item> itemsEnBanque = Banque;
+            List<Item> itemsEnBanque = new List<Item>();
 
             foreach (Inventory inv in p.FeuillePerso.inventory)
             {
@@ -421,69 +398,128 @@ namespace Artifacts.Bot
                 liste_Artifacts
                 ).ToList();
 
-            
+            Objet weapon = null;
+            Objet helmet = null;
+            Objet shield = null;
+            Objet body_armor = null;
+            Objet amulet = null;
+            Objet leg_armor = null;
+            Objet boots = null;
+            Objet ring1 = null;
+            Objet ring2 = null;
+            Objet artifact1 = null;
+            Objet artifact2 = null;
+            Objet artifact3 = null;
+
+
             List<string> listeStuff = new List<string>();
-            if (resultat.Count > 0)
+
+            foreach (IDictionary<string, IVariable<int>> sol in resultat)
             {
-                IDictionary<string, IVariable<int>> first = resultat.First();
-                foreach (IVariable<int> variable in first.Values)
+                foreach (IVariable<int> variable in sol.Values)
                 {
-
-                    if (variable.InstantiatedValue == -1)
+                    //Console.WriteLine(variable.Name + variable.InstantiatedValue);
+                    if (variable.Name == Constantes.weapon && variable.InstantiatedValue >= 0)
                     {
-                        continue;
+                        weapon = liste_arme[variable.InstantiatedValue];
                     }
-
-                    if (variable.Name == Constantes.amulet)
+                    if (variable.Name == Constantes.helmet && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_Amulet[variable.InstantiatedValue].code);
+                        helmet = liste_helmet[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.artifact1)
+                    if (variable.Name == Constantes.shield && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_Artifacts[variable.InstantiatedValue].code);
+                        shield = liste_shield[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.artifact2)
+                    if (variable.Name == Constantes.bodyArmor && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_Artifacts[variable.InstantiatedValue].code);
+                        body_armor = liste_BodyArmor[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.artifact3)
+                    if (variable.Name == Constantes.amulet && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_Artifacts[variable.InstantiatedValue].code);
+                        amulet = liste_Amulet[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.bodyArmor)
+                    if (variable.Name == Constantes.leg_armor && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_BodyArmor[variable.InstantiatedValue].code);
+                        leg_armor = liste_LegArmor[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.boots)
+                    if (variable.Name == Constantes.boots && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_Boots[variable.InstantiatedValue].code);
+                        boots = liste_Boots[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.helmet)
+                    if (variable.Name == Constantes.ring1 && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_helmet[variable.InstantiatedValue].code);
+                        ring1 = liste_Rings[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.leg_armor)
+                    if (variable.Name == Constantes.ring2 && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_LegArmor[variable.InstantiatedValue].code);
+                        ring2 = liste_Rings[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.ring1)
+                    if (variable.Name == Constantes.artifact1 && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_Rings[variable.InstantiatedValue].code);
+                        artifact1 = liste_Artifacts[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.ring2)
+                    if (variable.Name == Constantes.artifact2 && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_Rings[variable.InstantiatedValue].code);
+                        artifact2 = liste_Artifacts[variable.InstantiatedValue];
                     }
-                    if (variable.Name == Constantes.shield)
+                    if (variable.Name == Constantes.artifact3 && variable.InstantiatedValue >= 0)
                     {
-                        listeStuff.Add(liste_shield[variable.InstantiatedValue].code);
-                    }
-                    if (variable.Name == Constantes.weapon)
-                    {
-                        listeStuff.Add(liste_arme[variable.InstantiatedValue].code);
+                        artifact3 = liste_Artifacts[variable.InstantiatedValue];
                     }
                 }
+
+                if (Tuable(weapon,helmet,shield,body_armor,amulet,leg_armor,boots,ring1,ring2,artifact1,artifact2 ,artifact3))
+                {
+                    if (weapon != null)
+                    {
+                        listeStuff.Add(weapon.code);
+                    }
+                    if (helmet != null)
+                    {
+                        listeStuff.Add(helmet.code);
+                    }
+                    if (shield != null)
+                    {
+                        listeStuff.Add(shield.code);
+                    }
+                    if (body_armor != null)
+                    {
+                        listeStuff.Add(body_armor.code);
+                    }
+                    if (leg_armor != null)
+                    {
+                        listeStuff.Add(leg_armor.code);
+                    }
+                    if (boots != null)
+                    {
+                        listeStuff.Add(boots.code);
+                    }
+                    if (ring1 != null)
+                    {
+                        listeStuff.Add(ring1.code);
+                    }
+                    /*if (ring2 != null)
+                    {
+                        listeStuff.Add(ring2.code);
+                    }*/
+                    if (artifact1 != null)
+                    {
+                        listeStuff.Add(artifact1.code);
+                    }
+                    /*if (artifact2 != null)
+                    {
+                        listeStuff.Add(artifact2.code);
+                    }
+                    if (artifact3 != null)
+                    {
+                        listeStuff.Add(artifact3.code);
+                    }*/
+                    break;
+                }
+                //Console.WriteLine("");
             }
+            
             return listeStuff;
         }
 

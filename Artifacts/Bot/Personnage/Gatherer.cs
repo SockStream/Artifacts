@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Artifacts.Items;
+using Artifacts.Maps;
 using Artifacts.Monsters;
 using Artifacts.MyAccount;
 using Artifacts.MyCharacters;
@@ -32,12 +33,14 @@ namespace Artifacts.Bot.Personnage
                 {
                     Aller_Banque();
                     Vider_Inventaire();
+                    doitViderEnBanque = false;
                 }
                 if (CommandeEnAttente)
                 {
                     Aller_Banque();
                     Vider_Inventaire();
                     RecupererCommande();
+                    EquiperWeapon(WorkOrderList.First().Code);
                     CommandeEnAttente = false;
                 }
 
@@ -60,79 +63,202 @@ namespace Artifacts.Bot.Personnage
                         WorkOrderList.Add(wo);
                     }
                     NiveauMetierGagne = false;
-                    //finir de passer la commande au MCU
                 }
 
-                Resource resourceARecuperer = null;
-                WorkOrder wo_pris = null;
-                //traiter les workOrder
-                foreach (WorkOrder wo in mcu.GetListeWorkorderAttenteRessource())
+                
+                
+                List<Tuple<string, int>> listeTuplesCodeQuantite = mcu.GetListeDesResourcesPourTousLesCrafts(); //regarder pour le wood staff
+                if (listeTuplesCodeQuantite != null && listeTuplesCodeQuantite.Count > 0)
                 {
-                    if (resourceARecuperer != null)
+                    Aller_Banque();
+                    Vider_Inventaire();
+                    bool action_faite = false;
+                    foreach (Tuple<string, int> t in listeTuplesCodeQuantite)
                     {
-                        break;
-                    }
-                    //on va convertir le code de la ressource en Objet
-                    List<Tuple<string, int>> listeTuplesCodeQuantite = wo.ListeDesResources;
-                    if (listeTuplesCodeQuantite != null)
-                    {
-                        foreach (Tuple<string, int> t in listeTuplesCodeQuantite)
+                        Resource resourceARecuperer = null;
+                        Objet objet = mcu.getObjetList().Where(x => x.code == t.Item1).FirstOrDefault();
+                        Objet tst = mcu.getObjetList().Where(x => x.code == "copper_ore").FirstOrDefault();
+                        
+                        if (objet.craft == null)
                         {
-                            Resource TupleAsResource = mcu.ResourceList.Where(x => x.code == t.Item1).FirstOrDefault();
+                            Resource TupleAsResource = mcu.GetResourceList().Where(x => x.code == t.Item1).FirstOrDefault();
                             if (TupleAsResource != null)
                             {
                                 if (TupleAsResource.skill == Constantes.fishing && FeuillePerso.fishing_level >= TupleAsResource.level)
                                 {
                                     resourceARecuperer = TupleAsResource;
-                                    wo_pris = wo;
-                                    break;
                                 }
                                 if (TupleAsResource.skill == Constantes.mining && FeuillePerso.mining_level >= TupleAsResource.level)
                                 {
                                     resourceARecuperer = TupleAsResource;
-                                    wo_pris = wo;
-                                    break;
                                 }
                                 if (TupleAsResource.skill == Constantes.woodcutting && FeuillePerso.woodcutting_level >= TupleAsResource.level)
                                 {
                                     resourceARecuperer = TupleAsResource;
-                                    wo_pris = wo;
-                                    break;
                                 }
+                            }
+
+                            if (resourceARecuperer != null)
+                            {
+                                //aller sur la bonne tuile
+                                AllerSurTuile(resourceARecuperer);
+                                int niveau_actuel = GetNiveauMetier();
+                                Character c = MyCharactersEndPoint.Gathering(FeuillePerso.name);
+                                if (c != null)
+                                {
+                                    FeuillePerso = c;
+                                }
+                                if (GetNiveauMetier() != niveau_actuel)
+                                {
+                                    NiveauMetierGagne = true;
+                                }
+                                action_faite = true;
+                            }
+                        }
+                        else
+                        {
+                            if (objet.craft.skill == metier && objet.craft.level <= GetNiveauMetier()) //je peux le crafter
+                            {
+                                CrafterObjet(t.Item1, t.Item2);
+                                Aller_Banque();
+                                Vider_Inventaire();
+                                action_faite = true;
                             }
                         }
                     }
+                    if (!action_faite)
+                    {
+                        FarmerMeilleureRessource(metier);
+                    }
                 }
-                NouveauWorkOrder = false;
-
-                if (wo_pris != null)
+                else
                 {
-                    //aller sur la bonne tuile
-                    AllerSurTuile(resourceARecuperer);
-                    int niveau_actuel = GetNiveauMetier();
+                    FarmerMeilleureRessource(metier);
+                }
+            }
+            //code de fin
+            MyCharactersEndPoint.Move(FeuillePerso.name, 0, 0, false);
+            ConsoleManager.Write(FeuillePerso.name + "-> Fin", ConsoleColor.Gray);
+        }
+
+        internal void CrafterObjet(string code, int quantite)
+        {
+            Objet objet = mcu.getObjetList().Where(x => x.code == code).FirstOrDefault();
+            if (objet.craft == null)
+            {
+                Resource resource = mcu.GetResourceList().Where(x => x.drops != null && x.drops.Where(y => y.code == code).Any()).FirstOrDefault();
+                Inventory inv = FeuillePerso.inventory.Where(x => x.code == code).FirstOrDefault();
+                int quantiteDansSac = 0;
+                if (inv != null)
+                {
+                    quantiteDansSac = inv.quantity;
+                }
+                Item objetEnBanque = mcu.ConsulterBanque().Where(x => x.code == code).FirstOrDefault();
+                int quantiteEnBanque = 0;
+                if (objetEnBanque != null)
+                {
+                    quantiteEnBanque = Int32.Parse(objetEnBanque.quantity);
+                }
+                if (quantiteDansSac >= quantite)
+                {
+                    return;
+                }
+                if (quantiteDansSac + quantiteEnBanque >= quantite)
+                {
+                    Aller_Banque();
+                    mcu.RecupererDeBanque(FeuillePerso.name, code, quantite - quantiteDansSac);
+                    return;
+                }
+                if (quantiteEnBanque > 0)
+                {
+                    Aller_Banque();
+                    mcu.RecupererDeBanque(FeuillePerso.name, code, quantiteEnBanque);
+                }
+                AllerSurTuile(resource);
+                int niveauMetier_actuel = GetNiveauMetier();
+                int nvelleQuantite = quantiteDansSac;
+                while (nvelleQuantite + quantiteEnBanque < quantite)
+                {
                     Character c = MyCharactersEndPoint.Gathering(FeuillePerso.name);
                     if (c != null)
                     {
                         FeuillePerso = c;
                     }
-                    if (GetNiveauMetier() != niveau_actuel)
+                    nvelleQuantite = FeuillePerso.inventory.Where(x => x.code == code).First().quantity;
+                    objetEnBanque = mcu.ConsulterBanque().Where(x => x.code == code).FirstOrDefault();
+                    quantiteEnBanque = 0;
+                    if (objetEnBanque != null)
                     {
-                        NiveauMetierGagne = true;
+                        quantiteEnBanque = Int32.Parse(objetEnBanque.quantity);
                     }
                 }
-                else
+                if (GetNiveauMetier() != niveauMetier_actuel)
                 {
-                    while (!NiveauMetierGagne && !IsInventairePlein() && !NouveauWorkOrder && !termine)
+                    NiveauMetierGagne = true;
+                }
+                return;
+            }
+
+            if (objet == null)
+            {
+                throw new Exception("normalement pas possible");
+            }
+            else
+            {
+                foreach (Item item in objet.craft.items)
+                {
+                    if (!ExistsInInventory(item.code, Int32.Parse(item.quantity) * quantite))
                     {
-                        int niveauMetier = GetNiveauMetier();
-                        
-                        FarmerMeilleureRessource(metier);
+                        int quantite_requise = Int32.Parse(item.quantity) * quantite - NombreDansInventaire(item.code);
+                        CrafterObjet(item.code, quantite_requise);
                     }
                 }
             }
-            MyCharactersEndPoint.Move(FeuillePerso.name, 0, 0, false);
-            ConsoleManager.Write(FeuillePerso.name + "-> Fin", ConsoleColor.Gray);
+            //trouver et aller au bon workshop
+            Artifacts.Items.Craft craft = objet.craft;
+            if (craft.skill == Constantes.woodcutting)
+            {
+                Aller_woodcutting();
+            }
+            if (craft.skill == Constantes.mining)
+            {
+                Aller_mining();
+            }
+            if (craft.skill == Constantes.jewelrycrafting)
+            {
+                Aller_fishing();
+            }
+            MyCharactersEndPoint.Crafting(FeuillePerso.name, code, quantite);
         }
+
+        internal void Aller_woodcutting()
+        {
+            Tile tuile = mcu.Map.Where(x => x.content != null && x.content.code == Constantes.woodcutting).First();
+            Character c = MyCharactersEndPoint.Move(FeuillePerso.name, tuile.x, tuile.y);
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+        internal void Aller_mining()
+        {
+            Tile tuile = mcu.Map.Where(x => x.content != null && x.content.code == Constantes.mining).First();
+            Character c = MyCharactersEndPoint.Move(FeuillePerso.name, tuile.x, tuile.y);
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+        internal void Aller_fishing()
+        {
+            Tile tuile = mcu.Map.Where(x => x.content != null && x.content.code == Constantes.fishing).First();
+            Character c = MyCharactersEndPoint.Move(FeuillePerso.name, tuile.x, tuile.y);
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+
         internal void Vider_Inventaire()
         {
             List<Tuple<string,int>> aDeposer = new List<Tuple<string,int>>();

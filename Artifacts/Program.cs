@@ -28,6 +28,7 @@ namespace Artifacts
             {
                 ConsoleManager.Write(e.Message, ConsoleManager.errorConsoleColor);
                 ConsoleManager.Write(e.StackTrace, ConsoleManager.errorConsoleColor);
+                throw e;
             }
             finally
             {

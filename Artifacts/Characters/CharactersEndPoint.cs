@@ -42,6 +42,30 @@ namespace Artifacts.Characters
             }
         }
 
+        public static Character DeleteCharacter(string name)
+        {
+            string endpoint = "/characters/delete";
+            NamePayload payload = new NamePayload();
+            payload.name = name;
+            string strPayload = JsonConvert.SerializeObject(payload);
+            try
+            {
+                HttpWebResponse response = querySender.PostQuery(endpoint, strPayload);
+
+                using (var streamReader = new StreamReader(response.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    DataCharacter myReturnedDatas = JsonConvert.DeserializeObject<DataCharacter>(result);
+                    return myReturnedDatas.data;
+                }
+            }
+            catch (WebException ex)
+            {
+                ConsoleManager.Write(ex.Message, ConsoleManager.errorConsoleColor);
+                return null;
+            }
+        }
+
         public static GetAllCharactersResponse GetAllCharacters(int page, int size, string sort)
         {
             string endpoint = "/characters/?page=_PAGE_&size=_SIZE_";

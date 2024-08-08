@@ -14,11 +14,11 @@ namespace Artifacts.Bot.Personnage
 {
     public abstract class Personnage
     {
-        public List<WorkOrder> WorkOrderList { get; set; }
+        internal List<WorkOrder> WorkOrderList { get; set; }
         public Character FeuillePerso { get; set; }
         public bool doitViderEnBanque = false;
         public bool termine = false;
-        public bool NiveauMetierGagne = true, CommandeEnAttente = false, NouveauWorkOrder = false;
+        public bool NiveauMetierGagne = true, CommandeEnAttente = false;
         internal MCU mcu;
         public string metier;
         internal abstract void QueFaire();
@@ -64,7 +64,7 @@ namespace Artifacts.Bot.Personnage
             {
                 niveauMetier = FeuillePerso.fishing_level;
             }
-            if (metier == Constantes.fighting)
+            if (metier == Constantes.combat)
             {
                 niveauMetier = FeuillePerso.level;
             }
@@ -78,7 +78,7 @@ namespace Artifacts.Bot.Personnage
             }
             int niveauMetier_actuel = GetNiveauMetier();
             //on cherche la meilleure ressource associée à notre métier, on se déplace sur la case si on est pas déjà dessus, et on fait 1 Gather
-            Resource meilleureResource = mcu.ResourceList.Where(x => x.skill == metier && x.level <= niveauMetier_actuel).OrderByDescending(x => x.level).First();
+            Resource meilleureResource = mcu.GetResourceList().Where(x => x.skill == metier && x.level <= niveauMetier_actuel).OrderByDescending(x => x.level).FirstOrDefault();
             if (meilleureResource != null)
             {
                 AllerSurTuile(meilleureResource);
@@ -134,6 +134,10 @@ namespace Artifacts.Bot.Personnage
         internal void Aller_Banque()
         {
             Maps.Tile tuile = mcu.Map.Where(x => x.content != null && x.content.type == "bank").First();
+            if (tuile.x == FeuillePerso.x && tuile.y == FeuillePerso.y)
+            {
+                return;
+            }
             Character c = MyCharactersEndPoint.Move(FeuillePerso.name, tuile.x, tuile.y);
             if (c != null)
             {
@@ -141,9 +145,18 @@ namespace Artifacts.Bot.Personnage
             }
         }
 
-        internal void Retirer_Banque(string code, int quantity)
+        internal void Aller_GrandExchange()
         {
-            throw new NotImplementedException();
+            Maps.Tile tuile = mcu.Map.Where(x => x.content != null && x.content.type == "grand_exchange").First();
+            if (tuile.x == FeuillePerso.x && tuile.y == FeuillePerso.y)
+            {
+                return;
+            }
+            Character c = MyCharactersEndPoint.Move(FeuillePerso.name, tuile.x, tuile.y);
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
         }
 
         internal void AllerSurTuileMonstre(Monster monstre)
@@ -160,7 +173,7 @@ namespace Artifacts.Bot.Personnage
             }
         }
 
-        internal void RecupererCommande()
+        internal List<WorkOrder> RecupererCommande()
         {
             List<WorkOrder> WoRecupere = new List<WorkOrder>();
             foreach (WorkOrder wo in WorkOrderList)
@@ -173,30 +186,48 @@ namespace Artifacts.Bot.Personnage
                         FeuillePerso = c;
                     }
                     WoRecupere.Add(wo);
-                    mcu.SupprimerCommandeLivree(wo);
                 }
             }
             foreach (WorkOrder wo in WoRecupere)
             {
-                EquiperCommande(wo);
                 WorkOrderList.Remove(wo);
             }
+            return WoRecupere;
         }
 
-        private void EquiperCommande(WorkOrder wo)
+        internal bool ExistsInInventory(string code, int quantite = 1)
         {
-            //todo
-            throw new NotImplementedException();
+            Inventory inventory = FeuillePerso.inventory.Where(x => x.code == code).FirstOrDefault();
+            if (inventory == null)
+            {
+                return false;
+            }
+            if (inventory.quantity >= quantite)
+            {
+                return true;
+            }
+            return false;
         }
 
-        internal bool ExistsInInventory(string code)
+        internal int NombreDansInventaire(string code)
         {
-            return FeuillePerso.inventory.Where(x => x.code == code).Any();
+            int nb = 0;
+
+            Inventory inventory = FeuillePerso.inventory.Where(x => x.code == code).FirstOrDefault();
+            if (inventory == null)
+            {
+                nb = 0;
+            }
+            else
+            {
+                nb = inventory.quantity;
+            }
+            return nb;
         }
 
         internal void RetirerAmulette()
         {
-            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "amulet_slot");
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "amulet");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -204,7 +235,7 @@ namespace Artifacts.Bot.Personnage
         }
         internal void EquiperAmulette(string code)
         {
-            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "amulet_slot");
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "amulet");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -213,7 +244,7 @@ namespace Artifacts.Bot.Personnage
 
         internal void RetirerBodyArmor()
         {
-            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "body_armor_slot");
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "body_armor");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -221,7 +252,7 @@ namespace Artifacts.Bot.Personnage
         }
         internal void EquiperBodyArmor(string code)
         {
-            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "body_armor_slot");
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "body_armor");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -230,7 +261,7 @@ namespace Artifacts.Bot.Personnage
 
         internal void RetirerWeapon()
         {
-            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "weapon_slot");
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "weapon");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -238,7 +269,7 @@ namespace Artifacts.Bot.Personnage
         }
         internal void EquiperWeapon(string code)
         {
-            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "weapon_slot");
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "weapon");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -247,7 +278,7 @@ namespace Artifacts.Bot.Personnage
 
         internal void RetirerLegArmor()
         {
-            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "leg_armor_slot");
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "leg_armor");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -255,7 +286,7 @@ namespace Artifacts.Bot.Personnage
         }
         internal void EquiperLegArmor(string code)
         {
-            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "leg_armor_slot");
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "leg_armor");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -264,7 +295,7 @@ namespace Artifacts.Bot.Personnage
 
         internal void RetirerHelmet()
         {
-            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "helmet_slot");
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "helmet");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -272,7 +303,7 @@ namespace Artifacts.Bot.Personnage
         }
         internal void EquiperHelmet(string code)
         {
-            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "helmet_slot");
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "helmet");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -281,7 +312,7 @@ namespace Artifacts.Bot.Personnage
 
         internal void RetirerBoots()
         {
-            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "boots_slot");
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "boots");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -289,7 +320,7 @@ namespace Artifacts.Bot.Personnage
         }
         internal void EquiperBoots(string code)
         {
-            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "boots_slot");
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "boots");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -298,7 +329,7 @@ namespace Artifacts.Bot.Personnage
 
         internal void RetirerShield()
         {
-            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "shield_slot");
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "shield");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -306,7 +337,7 @@ namespace Artifacts.Bot.Personnage
         }
         internal void EquiperShield(string code)
         {
-            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "shield_slot");
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "shield");
             if (c != null)
             {
                 FeuillePerso = c;
@@ -318,7 +349,7 @@ namespace Artifacts.Bot.Personnage
             Character c = null;
             if (!String.IsNullOrEmpty(FeuillePerso.ring1_slot))
             {
-                MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "ring1_slot");
+                MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "ring1");
                 if (c != null)
                 {
                     FeuillePerso = c;
@@ -327,7 +358,7 @@ namespace Artifacts.Bot.Personnage
 
             if (!String.IsNullOrEmpty(FeuillePerso.ring2_slot))
             {
-                c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "ring2_slot");
+                c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "ring2");
                 if (c != null)
                 {
                     FeuillePerso = c;
@@ -336,9 +367,10 @@ namespace Artifacts.Bot.Personnage
         }
         internal void EquiperAnneau(string code)
         {
+            //de la merde
             if (String.IsNullOrEmpty(FeuillePerso.ring1_slot))
             {
-                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name,code, "ring1_slot");
+                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name,code, "ring1");
                 if (c != null)
                 {
                     FeuillePerso = c;
@@ -346,7 +378,7 @@ namespace Artifacts.Bot.Personnage
             }
             else
             {
-                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name,code, "ring2_slot");
+                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name,code, "ring2");
                 if (c != null)
                 {
                     FeuillePerso = c;
@@ -358,7 +390,7 @@ namespace Artifacts.Bot.Personnage
         {
             if (!String.IsNullOrEmpty(FeuillePerso.artifact1_slot))
             {
-                Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact1_slot");
+                Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact1");
                 if (c != null)
                 {
                     FeuillePerso = c;
@@ -366,7 +398,7 @@ namespace Artifacts.Bot.Personnage
             }
             if (!String.IsNullOrEmpty(FeuillePerso.artifact2_slot))
             {
-                Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact2_slot");
+                Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact2");
                 if (c != null)
                 {
                     FeuillePerso = c;
@@ -374,7 +406,7 @@ namespace Artifacts.Bot.Personnage
             }
             if (!String.IsNullOrEmpty(FeuillePerso.artifact3_slot))
             {
-                Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact3_slot");
+                Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact3");
                 if (c != null)
                 {
                     FeuillePerso = c;
@@ -385,7 +417,7 @@ namespace Artifacts.Bot.Personnage
         {
             if (String.IsNullOrEmpty(FeuillePerso.artifact1_slot))
             {
-                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "artifact1_slot");
+                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "artifact1");
                 if (c != null)
                 {
                     FeuillePerso = c;
@@ -393,7 +425,7 @@ namespace Artifacts.Bot.Personnage
             }
             else if (String.IsNullOrEmpty(FeuillePerso.artifact2_slot))
             {
-                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "artifact2_slot");
+                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "artifact2");
                 if (c != null)
                 {
                     FeuillePerso = c;
@@ -401,12 +433,22 @@ namespace Artifacts.Bot.Personnage
             }
             else
             {
-                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "artifact3_slot");
+                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "artifact3");
                 if (c != null)
                 {
                     FeuillePerso = c;
                 }
             }
+        }
+
+        internal int NombreDansBanque(string code)
+        {
+            Item item = mcu.ConsulterBanque().Where(x => x.code == code).FirstOrDefault();
+            if (item == null)
+            {
+                return 0;
+            }
+            return Int32.Parse(item.quantity);
         }
     }
 }
