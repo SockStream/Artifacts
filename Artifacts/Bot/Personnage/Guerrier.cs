@@ -100,7 +100,7 @@ namespace Artifacts.Bot.Personnage
                     CommandeEnAttente = false;
                 }
 
-                if (NiveauMetierGagne && WorkOrderList.Count == 0)
+                if (NiveauMetierGagne) //&& WorkOrderList.Count == 0)
                 {
                     int niveauMetier = GetNiveauMetier();
 
@@ -114,6 +114,10 @@ namespace Artifacts.Bot.Personnage
                         {
                             bool pieceCommandeeOuExiste = false;
                             if (ExistsInInventory(piece.code))
+                            {
+                                pieceCommandeeOuExiste = true;
+                            }
+                            if (EstPortee(piece.code))
                             {
                                 pieceCommandeeOuExiste = true;
                             }
@@ -394,6 +398,10 @@ namespace Artifacts.Bot.Personnage
                 {
                     bool pieceCommandeeOuExiste = false;
                     if (ExistsInInventory(piece.code))
+                    {
+                        pieceCommandeeOuExiste = true;
+                    }
+                    if (EstPortee(piece.code))
                     {
                         pieceCommandeeOuExiste = true;
                     }

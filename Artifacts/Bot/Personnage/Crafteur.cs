@@ -163,7 +163,27 @@ namespace Artifacts.Bot.Personnage
 
         internal void Farmer_jewelrycrafting()
         {
-            Objet obj = mcu.ObjetList.Where(x => x.craft != null && x.craft.skill == Constantes.jewelrycrafting && x.craft.level <= FeuillePerso.jewelrycrafting_level).OrderByDescending(x => x.level).FirstOrDefault();
+            List<Objet> listeObjetsMetierPalier = mcu.ObjetList.Where(x => x.craft != null && x.craft.skill == Constantes.jewelrycrafting && x.craft.level <= FeuillePerso.jewelrycrafting_level).OrderByDescending(x => x.level).ToList();
+            Objet obj = null;
+            foreach (Objet objet in listeObjetsMetierPalier)
+            {
+                bool dropMonstre = false;
+                foreach (Item item in objet.craft.items)
+                {
+                    if (mcu.EstUnDropMonstre(item.code))
+                    {
+                        dropMonstre = true;
+                    }
+                }
+                if (!dropMonstre)
+                {
+                    obj = objet;
+                    break;
+                }
+            }
+
+            if (obj == null)
+                obj= mcu.ObjetList.Where(x => x.craft != null && x.craft.skill == Constantes.jewelrycrafting && x.craft.level <= FeuillePerso.jewelrycrafting_level).OrderByDescending(x => x.level).FirstOrDefault();
             if (obj != null)
             {
                 WorkOrder wo = new WorkOrder();

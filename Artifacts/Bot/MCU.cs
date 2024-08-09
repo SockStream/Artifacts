@@ -739,5 +739,11 @@ namespace Artifacts.Bot
                 return ResourceList;
             }
         }
+
+        internal bool EstUnDropMonstre(string code)
+        {
+            bool resultat = MonsterList.Where(x => x.drops != null && x.drops.Where(x => x.code == code).Any()).Any();
+            return resultat;
+        }
     }
 }

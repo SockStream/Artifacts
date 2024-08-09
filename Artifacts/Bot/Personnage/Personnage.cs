@@ -211,6 +211,69 @@ namespace Artifacts.Bot.Personnage
             return WoRecupere;
         }
 
+        internal bool EstPortee(string code)
+        {
+            bool resultat = false;
+
+            if (FeuillePerso.amulet_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.artifact1_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.artifact2_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.artifact3_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.body_armor_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.boots_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.consumable1_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.consumable2_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.helmet_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.leg_armor_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.ring1_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.ring2_slot == code)
+            {
+                resultat = true;
+            }
+            if (FeuillePerso.shield_slot == code)
+            {
+                resultat = true;
+            }
+            if(FeuillePerso.weapon_slot == code)
+            {
+                resultat = true;
+            }
+
+            return resultat;
+        }
         internal bool ExistsInInventory(string code, int quantite = 1)
         {
             Inventory inventory = FeuillePerso.inventory.Where(x => x.code == code).FirstOrDefault();
