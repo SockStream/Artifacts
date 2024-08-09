@@ -34,6 +34,18 @@ namespace Artifacts.Bot.Personnage
             }
         }
 
+        internal void Vider_Gold()
+        {
+            if (FeuillePerso.gold > 0)
+            {
+                Character c = mcu.DeposerGold(FeuillePerso.name, FeuillePerso.gold);
+                if (c != null)
+                {
+                    FeuillePerso = c;
+                }
+            }
+        }
+
         internal void RamenerDrops(List<Tuple<string, int>> listeDesResources)
         {
             if (!doitViderEnBanque)
@@ -108,14 +120,22 @@ namespace Artifacts.Bot.Personnage
             }
         }
 
-        internal bool IsInventairePlein()
+        internal int nb_Items_Inventaire()
         {
-            bool plein = false;
             int cpt = 0;
             foreach (Inventory inventory in FeuillePerso.inventory)
             {
                 cpt += inventory.quantity;
             }
+            return cpt;
+        }
+
+        internal bool IsInventairePlein()
+        {
+            bool plein = false;
+            int cpt = nb_Items_Inventaire();
+
+
             if (cpt >= FeuillePerso.inventory_max_items)
             {
                 plein = true;
@@ -323,6 +343,91 @@ namespace Artifacts.Bot.Personnage
             }
         }
 
+        internal void RetirerAnneau1()
+        {
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "ring1");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+        internal void EquiperAnneau1(string code)
+        {
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "ring1");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+
+        internal void RetirerAnneau2()
+        {
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "ring2");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+        internal void EquiperAnneau2(string code)
+        {
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "ring2");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+
+        internal void RetirerArtifact1()
+        {
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact1");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+        internal void EquiperArtifact1(string code)
+        {
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "artifact1");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+
+        internal void RetirerArtifact2()
+        {
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact2");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+        internal void EquiperArtifact2(string code)
+        {
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "artifact2");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+
+        internal void RetirerArtifact3()
+        {
+            Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "artifact3");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+        internal void EquiperArtifact3(string code)
+        {
+            Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name, code, "artifact3");
+            if (c != null)
+            {
+                FeuillePerso = c;
+            }
+        }
+
         internal void RetirerShield()
         {
             Character c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "shield");
@@ -337,48 +442,6 @@ namespace Artifacts.Bot.Personnage
             if (c != null)
             {
                 FeuillePerso = c;
-            }
-        }
-
-        internal void RetirerAnneaux()
-        {
-            Character c = null;
-            if (!String.IsNullOrEmpty(FeuillePerso.ring1_slot))
-            {
-                MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "ring1");
-                if (c != null)
-                {
-                    FeuillePerso = c;
-                }
-            }
-
-            if (!String.IsNullOrEmpty(FeuillePerso.ring2_slot))
-            {
-                c = MyCharactersEndPoint.UnequipItem(FeuillePerso.name, "ring2");
-                if (c != null)
-                {
-                    FeuillePerso = c;
-                }
-            }
-        }
-        internal void EquiperAnneau(string code)
-        {
-            //de la merde
-            if (String.IsNullOrEmpty(FeuillePerso.ring1_slot))
-            {
-                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name,code, "ring1");
-                if (c != null)
-                {
-                    FeuillePerso = c;
-                }
-            }
-            else
-            {
-                Character c = MyCharactersEndPoint.EquipItem(FeuillePerso.name,code, "ring2");
-                if (c != null)
-                {
-                    FeuillePerso = c;
-                }
             }
         }
 

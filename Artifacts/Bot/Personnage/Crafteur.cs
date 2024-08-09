@@ -1,4 +1,5 @@
-﻿using Artifacts.Items;
+﻿using Artifacts.GrandExchange;
+using Artifacts.Items;
 using Artifacts.Maps;
 using Artifacts.MyCharacters;
 using Artifacts.Utilities;
@@ -18,14 +19,15 @@ namespace Artifacts.Bot.Personnage
         public Crafteur(MCU mCU)
         {
             mcu = mCU;
-            metier = null;
+            metier = Constantes.mining;
             WorkOrderList = new List<WorkOrder>();
         }
 
         internal override void QueFaire()
         {
             while (!termine)
-            { 
+            {
+                bool action_faite = false;
                 if (doitViderEnBanque)
                 {
                     Aller_Banque();
@@ -36,6 +38,7 @@ namespace Artifacts.Bot.Personnage
                 WorkOrder wo = mcu.GetWorkorderAttenteCraft();
                 if (wo != null && CrafterWorkOrder && PeutCrafter(wo.Code))
                 {
+                    action_faite = true;
                     CrafterWorkOrder = false;
                     Aller_Banque();
                     RecupererCompos(wo.Code, wo.Quantité);
@@ -50,6 +53,13 @@ namespace Artifacts.Bot.Personnage
                     else
                     {
                         wo.Demandeur.WorkOrderList.Remove(wo);
+                        Aller_Banque();
+                        Vider_Inventaire();
+                        //Aller_GrandExchange();
+                        //GrandExchange.GrandExchange exchange = GrandExchangeEndPoint.GetItem(wo.Code);
+                        //todo faire une boucle pour vendre si plus de 50
+                        //Character c = MyCharactersEndPoint.GeSellItem(FeuillePerso.name, wo.Code, Math.Min(wo.Quantité, 50), exchange.sell_price);
+
                     }
                     mcu.SupprimerCommandeLivree(wo);
                 }
@@ -71,7 +81,7 @@ namespace Artifacts.Bot.Personnage
                             minlvl = FeuillePerso.jewelrycrafting_level;
                             minCompetence = Constantes.jewelrycrafting;
                         }
-                        if (FeuillePerso.cooking_level <= minlvl)
+                        if (FeuillePerso.cooking_level <= minlvl && FeuillePerso.gearcrafting_level >= 25 && FeuillePerso.weaponcrafting_level >= 25 && FeuillePerso.jewelrycrafting_level >= 25)
                         {
                             minlvl = FeuillePerso.cooking_level;
                             minCompetence = Constantes.cooking;
@@ -89,14 +99,24 @@ namespace Artifacts.Bot.Personnage
                         {
                             Farmer_jewelrycrafting();
                         }
-                        if (minCompetence == Constantes.cooking)
+                        if (minCompetence == Constantes.cooking )
                         {
                             Farmer_cooking();
                         }
                     }
                 }
+                if (!action_faite)
+                {
+                    FarmerMeilleureRessource(metier);
+                    if (nb_Items_Inventaire() >=20)
+                    {
+                        doitViderEnBanque = true;
+                    }
+                }
             }
             //code de fin
+            Aller_Banque();
+            Vider_Gold();
             MyCharactersEndPoint.Move(FeuillePerso.name, 0, 0, false);
             ConsoleManager.Write(FeuillePerso.name + "-> Fin", ConsoleColor.Gray);
         }
@@ -119,7 +139,7 @@ namespace Artifacts.Bot.Personnage
             if (obj != null)
             {
                 WorkOrder wo = new WorkOrder();
-                wo.Quantité = 1;
+                wo.Quantité = 5;
                 wo.Demandeur = this;
                 wo.Code = obj.code;
                 mcu.AjouterWorkOrder(wo);
@@ -133,7 +153,7 @@ namespace Artifacts.Bot.Personnage
             if (obj != null)
             {
                 WorkOrder wo = new WorkOrder();
-                wo.Quantité = 1;
+                wo.Quantité = 5;
                 wo.Demandeur = this;
                 wo.Code = obj.code;
                 mcu.AjouterWorkOrder(wo);
@@ -147,7 +167,7 @@ namespace Artifacts.Bot.Personnage
             if (obj != null)
             {
                 WorkOrder wo = new WorkOrder();
-                wo.Quantité = 1;
+                wo.Quantité = 5;
                 wo.Demandeur = this;
                 wo.Code = obj.code;
                 mcu.AjouterWorkOrder(wo);

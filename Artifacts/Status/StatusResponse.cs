@@ -17,6 +17,7 @@ namespace Artifacts.Status
         public string status { get; set; }
         public string version { get; set; }
         public int characters_online { get; set; }
+        public DateTime server_time { get; set; }
         public List<Announcement> announcements { get; set; }
         public string last_wipe { get; set; }
         public string next_wipe { get; set; }

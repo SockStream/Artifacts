@@ -224,7 +224,8 @@ namespace Artifacts.Bot
                         }
                         if (listeDrops.Count == 0 && aLeNiveauPourCrafter)
                         {
-                            foreach(Personnage.Personnage p in ListePersonnages)
+                            listeDrops = GenererListeDesDrops(wo.Code, wo.Quantité, new List<Tuple<string, int>>());
+                            foreach (Personnage.Personnage p in ListePersonnages)
                             {
                                 if (p.GetType() != typeof(Crafteur))
                                 {
@@ -334,6 +335,12 @@ namespace Artifacts.Bot
                 ConsoleManager.Write("Server status : " + response.data.status);
                 ConsoleManager.Write("Server version : " + response.data.version);
                 ConsoleManager.Write("Characters online : " + response.data.characters_online);
+                ConsoleManager.Write("Server time : " + response.data.server_time);
+                foreach (Announcement announcement in response.data.announcements)
+                {
+                    ConsoleManager.Write(announcement.message);
+                    ConsoleManager.Write(announcement.created_at.ToString("dd/MM/yyyy"));
+                }
                 ConsoleManager.Write("Last wipe : " + response.data.last_wipe);
                 ConsoleManager.Write("Next wipe : " + response.data.next_wipe);
             }
@@ -365,18 +372,18 @@ namespace Artifacts.Bot
                     {
                         nb_existant = itemDeEquipe.Item2;
                     }
-                    int NbRequises = Math.Max(0, Int32.Parse(item.quantity) - nb_existant);
+                    int NbRequises = Int32.Parse(item.quantity)*quantite - nb_existant;
                     if (NbRequises > 0)
                     {
                         //maintenant on doit regarder si c'est une ressource, un drop ou un Objet
                         Objet obj = ObjetList.Where(x => x.code.Equals(item.code)).First();
                         if (obj.type == "resource" ||obj.code == "wooden_stick")
                         {
-                            listeDesResources.Add(new Tuple<string, int>(item.code, NbRequises * quantite));
+                            listeDesResources.Add(new Tuple<string, int>(item.code, NbRequises));
                         }
                         else
                         {
-                            GenererListeDesDrops(item.code, NbRequises * quantite, _ItemsDeEquipe);
+                            GenererListeDesDrops(item.code, NbRequises, _ItemsDeEquipe);
                         }
                     }
                 }
@@ -494,7 +501,7 @@ namespace Artifacts.Bot
             return craftable;
         }*/
 
-        public List<string> CSPCombat(Personnage.Personnage p, Monster m)
+        public List<Tuple<Enums.EmplacementPieceStuff, string>> CSPCombat(Personnage.Personnage p, Monster m)
         {
             CSP_Fight cSP_Fight = new CSP_Fight(p, m, this.ObjetList);
             return cSP_Fight.GenererListePossibilites();
@@ -658,6 +665,12 @@ namespace Artifacts.Bot
             }
         }
 
+        internal Character DeposerGold(string name, int amount)
+        {
+            Character c = MyCharactersEndPoint.DepositBankGold(name, amount);
+            return c;
+        }
+
         public Character RecupererDeBanque(string name, string code, int quantite)
         {
             if (quantite == 0)
@@ -701,8 +714,11 @@ namespace Artifacts.Bot
                 {
                     foreach (Inventory inventory in p.FeuillePerso.inventory)
                     {
-                        Tuple<string, int> t = new Tuple<string, int>(inventory.code, inventory.quantity);
-                        ItemsDeEquipe.Add(t);
+                        if (!string.IsNullOrEmpty(inventory.code))
+                        {
+                            Tuple<string, int> t = new Tuple<string, int>(inventory.code, inventory.quantity);
+                            ItemsDeEquipe.Add(t);
+                        }
                     }
                 }
             }

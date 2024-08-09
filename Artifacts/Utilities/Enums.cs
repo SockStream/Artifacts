@@ -13,5 +13,21 @@ namespace Artifacts.Utilities
             Bucheron,
             Mineur
         }
+
+        public enum EmplacementPieceStuff
+        {
+            weapon,
+            helmet,
+            shield,
+            body_armor,
+            amulet,
+            leg_armor,
+            boots,
+            ring1,
+            ring2,
+            artifact1,
+            artifact2,
+            artifact3
+        }
     }
 }

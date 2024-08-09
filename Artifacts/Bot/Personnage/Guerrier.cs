@@ -126,8 +126,17 @@ namespace Artifacts.Bot.Personnage
                             }
                             if (!pieceCommandeeOuExiste)
                             {
+                                int quantite = 1;
+                                if (piece.type == Constantes.ring)
+                                {
+                                    quantite = 2;
+                                }
+                                if (piece.type == Constantes.artifact)
+                                {
+                                    quantite = 3;
+                                }
                                 WorkOrder wo = new WorkOrder();
-                                wo.Quantité = 1;
+                                wo.Quantité = quantite;
                                 wo.Code = piece.code;
                                 wo.Demandeur = this;
                                 mcu.AjouterWorkOrder(wo);
@@ -139,7 +148,7 @@ namespace Artifacts.Bot.Personnage
                 }
 
                 Monster monstreATuer = null;
-                List<string> stuffAEquiper = new List<string>();
+                List<Tuple<Enums.EmplacementPieceStuff, string>> stuffAEquiper = new List<Tuple<Enums.EmplacementPieceStuff, string>>();
                 
                 //on va convertir le code de la ressource en Objet
                 List<Tuple<string, int>> listeTuplesCodeQuantite = mcu.GetListeDesResourcesPourTousLesCrafts();
@@ -150,7 +159,7 @@ namespace Artifacts.Bot.Personnage
                         Monster m = mcu.MonsterList.Where(x => x.drops.Where(y => y.code == t.Item1).Any()).FirstOrDefault();
                         if (m != null)
                         {
-                            List<string> resultat = mcu.CSPCombat(this, m);
+                            List<Tuple<Enums.EmplacementPieceStuff, string>> resultat = mcu.CSPCombat(this, m);
                             if (resultat.Count > 0)
                             {
                                 monstreATuer = m;
@@ -189,6 +198,8 @@ namespace Artifacts.Bot.Personnage
                 }
             }
             //code de fin
+            Aller_Banque();
+            Vider_Gold();
             MyCharactersEndPoint.Move(FeuillePerso.name, 0, 0, false);
             ConsoleManager.Write(FeuillePerso.name + "-> Fin", ConsoleColor.Gray);
         }
@@ -198,7 +209,7 @@ namespace Artifacts.Bot.Personnage
             foreach (Monster m in mcu.MonsterList.OrderByDescending(x => x.level))
             {
                 //Console.WriteLine("__" + m.name + "__");
-                List<string> resultat = mcu.CSPCombat(this, m);
+                List<Tuple<Enums.EmplacementPieceStuff, string>> resultat = mcu.CSPCombat(this, m);
                 if (resultat.Count > 0)
                 {
                     //equiperStuff
@@ -210,165 +221,141 @@ namespace Artifacts.Bot.Personnage
             }
         }
 
-        internal void EquiperStuff(List<string> stuffAEquiper) // prérequis, le stuff est dans mon inventaire
+        internal void EquiperStuff(List<Tuple<Enums.EmplacementPieceStuff, string>> stuffAEquiper) // prérequis, le stuff est dans mon inventaire
         {
             List<string> listeAnneaux = new List<string>();
             List<string> listeArtefacts = new List<string>();
 
-            foreach(string piece in stuffAEquiper)
+            foreach(Tuple<Enums.EmplacementPieceStuff, string> piece in stuffAEquiper)
             {
-                Objet objet = mcu.ObjetList.Where(x => x.code ==piece).FirstOrDefault();
+                Objet objet = mcu.ObjetList.Where(x => x.code ==piece.Item2).FirstOrDefault();
                 if (objet!= null)
                 {
-                    if (objet.type == Constantes.amulet)
+                    switch(piece.Item1)
                     {
-                        //si je ne la porte pas 
-                        if (FeuillePerso.amulet_slot != piece)
-                        {
-                            RetirerAmulette(); // retire l'amulette si j'en ai une
-                            EquiperAmulette(piece);
-                        }
-                    }
-                    if (objet.type == Constantes.bodyArmor)
-                    {
-                        //si je ne la porte pas 
-                        if (FeuillePerso.body_armor_slot != piece)
-                        {
-                            RetirerBodyArmor(); // retire l'amulette si j'en ai une
-                            //si elle est dans mon inventaire
-                            if (!ExistsInInventory(piece))
-                            {
-                                //je vais la récupérer à la banque
-                                Aller_Banque();
-                                mcu.RecupererDeBanque(FeuillePerso.name,piece, 1);
-                            }
-                            //je mets la pièce depuis mon inventaire
-                            EquiperBodyArmor(piece);
-                        }
-                    }
-                    if (objet.type == Constantes.weapon)
-                    {
-                        //si je ne la porte pas 
-                        if (FeuillePerso.weapon_slot != piece)
-                        {
-                            if (FeuillePerso.weapon_slot != piece)
+                        case EmplacementPieceStuff.weapon:
+                            if (FeuillePerso.weapon_slot != piece.Item2 && FeuillePerso.weapon_slot != "")
                             {
                                 RetirerWeapon(); // retire l'amulette si j'en ai une
+                                
                             }
-                            //si elle est dans mon inventaire
-                            if (!ExistsInInventory(piece) && FeuillePerso.weapon_slot != piece)
+                            if (FeuillePerso.weapon_slot != piece.Item2)
                             {
-                                //je vais la récupérer à la banque
-                                Aller_Banque();
-                                mcu.RecupererDeBanque(FeuillePerso.name,piece, 1);
+                                EquiperWeapon(piece.Item2);
                             }
-                            if (FeuillePerso.weapon_slot != piece)
+                            break;
+                        case EmplacementPieceStuff.helmet:
+                            if (FeuillePerso.helmet_slot != piece.Item2 && FeuillePerso.helmet_slot != "")
                             {
-                                //je mets la pièce depuis mon inventaire
-                                EquiperWeapon(piece);
+                                RetirerHelmet(); // retire l'amulette si j'en ai une
                             }
-                        }
-                    }
-                    if (objet.type == Constantes.leg_armor)
-                    {
-                        //si je ne la porte pas 
-                        if (FeuillePerso.leg_armor_slot != piece)
-                        {
-                            RetirerLegArmor(); // retire l'amulette si j'en ai une
-                            //si elle est dans mon inventaire
-                            if (!ExistsInInventory(piece))
+                            if (FeuillePerso.helmet_slot != piece.Item2)
                             {
-                                //je vais la récupérer à la banque
-                                Aller_Banque();
-                                mcu.RecupererDeBanque(FeuillePerso.name,piece, 1);
+                                EquiperHelmet(piece.Item2);
                             }
-                            //je mets la pièce depuis mon inventaire
-                            EquiperLegArmor(piece);
-                        }
-                    }
-                    if (objet.type == Constantes.helmet)
-                    {
-                        //si je ne la porte pas 
-                        if (FeuillePerso.helmet_slot != piece)
-                        {
-                            RetirerHelmet(); // retire l'amulette si j'en ai une
-                            //si elle est dans mon inventaire
-                            if (!ExistsInInventory(piece))
+                            break;
+                        case EmplacementPieceStuff.shield:
+                            if (FeuillePerso.shield_slot != piece.Item2 && FeuillePerso.shield_slot != "")
                             {
-                                //je vais la récupérer à la banque
-                                Aller_Banque();
-                                mcu.RecupererDeBanque(FeuillePerso.name,piece, 1);
+                                RetirerShield(); // retire l'amulette si j'en ai une
                             }
-                            //je mets la pièce depuis mon inventaire
-                            EquiperHelmet(piece);
-                        }
-                    }
-                    if (objet.type == Constantes.boots)
-                    {
-                        //si je ne la porte pas 
-                        if (FeuillePerso.boots_slot != piece)
-                        {
-                            RetirerBoots(); // retire l'amulette si j'en ai une
-                            //si elle est dans mon inventaire
-                            if (!ExistsInInventory(piece))
+                            if (FeuillePerso.shield_slot != piece.Item2)
                             {
-                                //je vais la récupérer à la banque
-                                Aller_Banque();
-                                mcu.RecupererDeBanque(FeuillePerso.name,piece, 1);
+                                EquiperShield(piece.Item2);
                             }
-                            //je mets la pièce depuis mon inventaire
-                            EquiperBoots(piece);
-                        }
-                    }
-                    if (objet.type == Constantes.shield)
-                    {
-                        //si je ne la porte pas 
-                        if (FeuillePerso.shield_slot != piece)
-                        {
-                            RetirerShield(); // retire l'amulette si j'en ai une
-                            //si elle est dans mon inventaire
-                            if (!ExistsInInventory(piece))
+                            break;
+                        case EmplacementPieceStuff.body_armor:
+                            if (FeuillePerso.body_armor_slot != piece.Item2 && FeuillePerso.body_armor_slot != "")
                             {
-                                //je vais la récupérer à la banque
-                                Aller_Banque();
-                                mcu.RecupererDeBanque(FeuillePerso.name,piece, 1);
+                                RetirerBodyArmor(); // retire l'amulette si j'en ai une
                             }
-                            //je mets la pièce depuis mon inventaire
-                            EquiperShield(piece);
-                        }
-                    }
-                    if (objet.type == Constantes.artifact)
-                    {
-                        listeArtefacts.Add(piece);
-                    }
-                    if (objet.type == Constantes.ring)
-                    {
-                        listeAnneaux.Add(piece);
+                            if (FeuillePerso.body_armor_slot != piece.Item2)
+                            {
+                                EquiperBodyArmor(piece.Item2);
+                            }
+                            break;
+                        case EmplacementPieceStuff.amulet:
+                            if (FeuillePerso.amulet_slot != piece.Item2 && FeuillePerso.amulet_slot != "")
+                            {
+                                RetirerAmulette(); // retire l'amulette si j'en ai une
+                            }
+                            if (FeuillePerso.amulet_slot != piece.Item2)
+                            {
+                                EquiperAmulette(piece.Item2);
+                            }
+                            break;
+                        case EmplacementPieceStuff.leg_armor:
+                            if (FeuillePerso.leg_armor_slot != piece.Item2 && FeuillePerso.leg_armor_slot != "")
+                            {
+                                RetirerLegArmor(); // retire l'amulette si j'en ai une
+                            }
+                            if (FeuillePerso.leg_armor_slot != piece.Item2)
+                            {
+                                EquiperLegArmor(piece.Item2);
+                            }
+                            break;
+                        case EmplacementPieceStuff.boots:
+                            if (FeuillePerso.boots_slot != piece.Item2 && FeuillePerso.boots_slot != "")
+                            {
+                                RetirerBoots(); // retire l'amulette si j'en ai une
+                            }
+                            if (FeuillePerso.boots_slot != piece.Item2)
+                            {
+                                EquiperBoots(piece.Item2);
+                            }
+                            break;
+                        case EmplacementPieceStuff.ring1:
+                            if (FeuillePerso.ring1_slot != piece.Item2 && FeuillePerso.ring1_slot != "")
+                            {
+                                RetirerAnneau1(); // retire l'amulette si j'en ai une
+                            }
+                            if (FeuillePerso.ring1_slot != piece.Item2)
+                            {
+                                EquiperAnneau1(piece.Item2);
+                            }
+                            break;
+                        case EmplacementPieceStuff.ring2:
+                            if (FeuillePerso.ring2_slot != piece.Item2 && FeuillePerso.ring2_slot != "")
+                            {
+                                RetirerAnneau2(); // retire l'amulette si j'en ai une
+                            }
+                            if (FeuillePerso.ring2_slot != piece.Item2)
+                            {
+                                EquiperAnneau2(piece.Item2);
+                            }
+                            break;
+                        case EmplacementPieceStuff.artifact1:
+                            if (FeuillePerso.artifact1_slot != piece.Item2 && FeuillePerso.artifact1_slot != "")
+                            {
+                                RetirerArtifact1(); // retire l'amulette si j'en ai une
+                            }
+                            if (FeuillePerso.artifact1_slot != piece.Item2)
+                            {
+                                EquiperArtifact1(piece.Item2);
+                            }
+                            break;
+                        case EmplacementPieceStuff.artifact2:
+                            if (FeuillePerso.artifact2_slot != piece.Item2 && FeuillePerso.artifact2_slot != "")
+                            {
+                                RetirerArtifact2(); // retire l'amulette si j'en ai une
+                            }
+                            if (FeuillePerso.artifact2_slot != piece.Item2)
+                            {
+                                EquiperArtifact2(piece.Item2);
+                            }
+                            break;
+                        case EmplacementPieceStuff.artifact3:
+                            if (FeuillePerso.artifact3_slot != piece.Item2 && FeuillePerso.artifact3_slot != "")
+                            {
+                                RetirerArtifact3(); // retire l'amulette si j'en ai une
+                            }
+                            if (FeuillePerso.artifact3_slot != piece.Item2)
+                            {
+                                EquiperArtifact3(piece.Item2);
+                            }
+                            break;
                     }
                 }
-            }
-
-            RetirerAnneaux();
-            RetirerArtefacts();
-            foreach (string anneau in listeAnneaux)
-            {
-                if (!ExistsInInventory(anneau))
-                {
-                    //je vais la récupérer à la banque
-                    Aller_Banque();
-                    mcu.RecupererDeBanque(FeuillePerso.name,anneau, 1);
-                }
-                EquiperAnneau(anneau);
-            }
-            foreach (string artefact in listeArtefacts)
-            {
-                if (!ExistsInInventory(artefact))
-                {
-                    //je vais la récupérer à la banque
-                    Aller_Banque();
-                    mcu.RecupererDeBanque(FeuillePerso.name,artefact, 1);
-                }
-                EquiperArtefact(artefact);
             }
         }
 

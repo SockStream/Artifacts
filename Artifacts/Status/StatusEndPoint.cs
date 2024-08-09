@@ -1,4 +1,5 @@
-﻿using Artifacts.Characters;
+﻿using Artifacts.Bot;
+using Artifacts.Characters;
 using Artifacts.Utilities.ConsoleManager;
 using Artifacts.Utilities.Network;
 using Newtonsoft.Json;

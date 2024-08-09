@@ -20,6 +20,8 @@ namespace Artifacts.Utilities.Network
 
         public HttpWebResponse PostQuery(string EndPoint, string JsonPayload)
         {
+            int i = 0;
+            envoi_get:
             string Query = server + EndPoint;
 
             WebHeaderCollection Headers = new WebHeaderCollection();
@@ -41,9 +43,20 @@ namespace Artifacts.Utilities.Network
             try
             {
                 httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                i = 0;
             }
             catch (WebException ex)
             {
+                i++;
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    if (i < 4)
+                    {
+                        Console.WriteLine("serveur hors ligne");
+                        Thread.Sleep(30000);
+                        goto envoi_get;
+                    }
+                }
                 throw ex;
             }
             /*using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
@@ -55,6 +68,8 @@ namespace Artifacts.Utilities.Network
 
         public HttpWebResponse GetQuery(string EndPoint)
         {
+            int i = 0;
+            envoi_post:
             string Query = server + EndPoint;
 
             WebHeaderCollection Headers = new WebHeaderCollection();
@@ -67,9 +82,20 @@ namespace Artifacts.Utilities.Network
             try
             {
                 httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                i = 0;
             }
             catch (WebException ex)
             {
+                i++;
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    if (i < 4)
+                    {
+                        Console.WriteLine("serveur hors ligne");
+                        Thread.Sleep(30000);
+                        goto envoi_post;
+                    }
+                }
                 throw ex;
             }
             /*using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))

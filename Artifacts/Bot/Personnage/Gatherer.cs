@@ -19,6 +19,7 @@ namespace Artifacts.Bot.Personnage
     internal class Gatherer : Personnage
     {
         internal Enums.GathererTypeEnum gathererTypeEnum;
+        List<int> ListePaliers = new List<int>() { 10, 30 };
         public Gatherer(Enums.GathererTypeEnum type, MCU mCU)
         {
             gathererTypeEnum = type;
@@ -48,20 +49,24 @@ namespace Artifacts.Bot.Personnage
                 if (NiveauMetierGagne && WorkOrderList.Count == 0)
                 {
                     int niveauMetier = GetNiveauMetier();
-                    List<Objet> ListeBest_tool = mcu.getObjetList().Where(x => x.type == Constantes.weapon && x.subtype == Constantes.tool && x.level <= niveauMetier && x.effects.Where(y => y.name == metier).Any()).ToList();
-                    Objet best_tool = null;
-                    if (ListeBest_tool.Count > 0)
+                    int? palier = ListePaliers.Where(x => x <= niveauMetier).OrderByDescending(x => x).FirstOrDefault();
+                    if (palier != 0)
                     {
-                        best_tool = ListeBest_tool.OrderByDescending(x => x.level).FirstOrDefault();
-                    }
-                    if (best_tool != null && FeuillePerso.weapon_slot != best_tool.code)
-                    {
-                        WorkOrder wo = new WorkOrder();
-                        wo.Quantité = 1;
-                        wo.Code = best_tool.code;
-                        wo.Demandeur = this;
-                        mcu.AjouterWorkOrder(wo);
-                        WorkOrderList.Add(wo);
+                        List<Objet> ListeBest_tool = mcu.getObjetList().Where(x => x.type == Constantes.weapon && x.subtype == Constantes.tool && x.level == palier && x.effects.Where(y => y.name == metier).Any()).ToList();
+                        Objet best_tool = null;
+                        if (ListeBest_tool.Count > 0)
+                        {
+                            best_tool = ListeBest_tool.OrderByDescending(x => x.level).FirstOrDefault();
+                        }
+                        if (best_tool != null && FeuillePerso.weapon_slot != best_tool.code)
+                        {
+                            WorkOrder wo = new WorkOrder();
+                            wo.Quantité = 1;
+                            wo.Code = best_tool.code;
+                            wo.Demandeur = this;
+                            mcu.AjouterWorkOrder(wo);
+                            WorkOrderList.Add(wo);
+                        }
                     }
                     NiveauMetierGagne = false;
                 }
@@ -71,8 +76,6 @@ namespace Artifacts.Bot.Personnage
                 List<Tuple<string, int>> listeTuplesCodeQuantite = mcu.GetListeDesResourcesPourTousLesCrafts(); //regarder pour le wood staff
                 if (listeTuplesCodeQuantite != null && listeTuplesCodeQuantite.Count > 0)
                 {
-                    Aller_Banque();
-                    Vider_Inventaire();
                     bool action_faite = false;
                     foreach (Tuple<string, int> t in listeTuplesCodeQuantite)
                     {
@@ -101,6 +104,8 @@ namespace Artifacts.Bot.Personnage
 
                             if (resourceARecuperer != null)
                             {
+                                Aller_Banque();
+                                Vider_Inventaire();
                                 //aller sur la bonne tuile
                                 AllerSurTuile(resourceARecuperer);
                                 int niveau_actuel = GetNiveauMetier();
@@ -120,6 +125,8 @@ namespace Artifacts.Bot.Personnage
                         {
                             if (objet.craft.skill == metier && objet.craft.level <= GetNiveauMetier()) //je peux le crafter
                             {
+                                Aller_Banque();
+                                Vider_Inventaire();
                                 int nombre_de_fournées = (int)t.Item2 / 10;
                                 int restant = t.Item2 % 10;
                                 for(int i = 0; i < nombre_de_fournées; i++)
@@ -150,6 +157,8 @@ namespace Artifacts.Bot.Personnage
                 }
             }
             //code de fin
+            Aller_Banque();
+            Vider_Gold();
             MyCharactersEndPoint.Move(FeuillePerso.name, 0, 0, false);
             ConsoleManager.Write(FeuillePerso.name + "-> Fin", ConsoleColor.Gray);
         }
@@ -182,11 +191,6 @@ namespace Artifacts.Bot.Personnage
                     mcu.RecupererDeBanque(FeuillePerso.name, code, quantite - quantiteDansSac);
                     return;
                 }
-                if (quantiteEnBanque > 0)
-                {
-                    Aller_Banque();
-                    mcu.RecupererDeBanque(FeuillePerso.name, code, quantiteEnBanque);
-                }
                 AllerSurTuile(resource);
                 int niveauMetier_actuel = GetNiveauMetier();
                 int nvelleQuantite = quantiteDansSac;
@@ -206,6 +210,11 @@ namespace Artifacts.Bot.Personnage
                     {
                         quantiteEnBanque = Int32.Parse(objetEnBanque.quantity);
                     }
+                }
+                if (quantiteEnBanque > 0)
+                {
+                    Aller_Banque();
+                    mcu.RecupererDeBanque(FeuillePerso.name, code, quantiteEnBanque);
                 }
                 if (GetNiveauMetier() != niveauMetier_actuel)
                 {

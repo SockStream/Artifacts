@@ -39,10 +39,10 @@ namespace Artifacts.Bot
             var leg_armor = new VariableInteger("leg_armor",-1,-1);
             var boots = new VariableInteger("boots",-1,-1);
             var ring1 = new VariableInteger("ring1", -1, -1);
-            //var ring2 = new VariableInteger("ring2", -1, -1);
+            var ring2 = new VariableInteger("ring2", -1, -1);
             var artifact1 = new VariableInteger("artifact1", -1, -1);
-            //var artifact2 = new VariableInteger("artifact2", -1, -1); //merde, il faut améliorer pour pouvoir les utiliser
-            //var artifact3 = new VariableInteger("artifact3", -1, -1);
+            var artifact2 = new VariableInteger("artifact2", -1, -1); //merde, il faut améliorer pour pouvoir les utiliser
+            var artifact3 = new VariableInteger("artifact3", -1, -1);
 
             if (liste_arme.Count > 0)
             {
@@ -82,21 +82,21 @@ namespace Artifacts.Bot
             if (liste_Rings.Count > 0)
             {
                 ring1 = new VariableInteger(Constantes.ring1, 0, liste_Rings.Count - 1);
-                //ring2 = new VariableInteger(Constantes.ring2, 0, liste_Rings.Count - 1);
+                ring2 = new VariableInteger(Constantes.ring2, 0, liste_Rings.Count - 1);
             }
             if (liste_Artifacts.Count > 0) //todo : mal géré
             {
                 artifact1 = new VariableInteger(Constantes.artifact1, 0, liste_Artifacts.Count - 1);
-                //artifact2 = new VariableInteger(Constantes.artifact2, 0, liste_Artifacts.Count - 1);
-                //artifact3 = new VariableInteger(Constantes.artifact3, 0, liste_Artifacts.Count - 1);
+                artifact2 = new VariableInteger(Constantes.artifact2, 0, liste_Artifacts.Count - 1);
+                artifact3 = new VariableInteger(Constantes.artifact3, 0, liste_Artifacts.Count - 1);
             }
 
             VariableInteger res = new VariableInteger("resultat", 1, 1);
             var constraints = new List<IConstraint>
             {
             };
-            //var variables = new[] { weapon, helmet, shield, body_armor, amulet, leg_armor, boots, ring1, ring2, artifact1, artifact2, artifact3 };
-            var variables = new[] { weapon, helmet, shield, body_armor, amulet, leg_armor, boots, ring1,  artifact1};
+            var variables = new[] { weapon, helmet, shield, body_armor, amulet, leg_armor, boots, ring1, ring2, artifact1, artifact2, artifact3 };
+            //var variables = new[] { weapon, helmet, shield, body_armor, amulet, leg_armor, boots, ring1,  artifact1};
             var state = new StateInteger(variables, constraints);
             StateOperationResult searchResult = state.SearchAllSolutions();
             //Console.WriteLine(state.Runtime);
@@ -281,7 +281,7 @@ namespace Artifacts.Bot
             return victoire;
         }
 
-        public List<string> GenererListePossibilites()
+        public List<Tuple<Enums.EmplacementPieceStuff, string>> GenererListePossibilites()
         {
             List<Objet> liste_arme = new List<Objet>();
             List<Objet> liste_helmet = new List<Objet>();
@@ -412,7 +412,7 @@ namespace Artifacts.Bot
             Objet artifact3 = null;
 
 
-            List<string> listeStuff = new List<string>();
+            List<Tuple<Enums.EmplacementPieceStuff, string>> listeStuff = new List<Tuple<Enums.EmplacementPieceStuff, string>>();
 
             foreach (IDictionary<string, IVariable<int>> sol in resultat)
             {
@@ -473,48 +473,48 @@ namespace Artifacts.Bot
                 {
                     if (weapon != null)
                     {
-                        listeStuff.Add(weapon.code);
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff,string>(Enums.EmplacementPieceStuff.weapon, weapon.code));
                     }
                     if (helmet != null)
                     {
-                        listeStuff.Add(helmet.code);
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.helmet,helmet.code));
                     }
                     if (shield != null)
                     {
-                        listeStuff.Add(shield.code);
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.shield,shield.code));
                     }
                     if (body_armor != null)
                     {
-                        listeStuff.Add(body_armor.code);
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.body_armor,body_armor.code));
                     }
                     if (leg_armor != null)
                     {
-                        listeStuff.Add(leg_armor.code);
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.leg_armor,leg_armor.code));
                     }
                     if (boots != null)
                     {
-                        listeStuff.Add(boots.code);
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.boots,boots.code));
                     }
                     if (ring1 != null)
                     {
-                        listeStuff.Add(ring1.code);
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.ring1,ring1.code));
                     }
-                    /*if (ring2 != null)
+                    if (ring2 != null)
                     {
-                        listeStuff.Add(ring2.code);
-                    }*/
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.ring2,ring2.code));
+                    }
                     if (artifact1 != null)
                     {
-                        listeStuff.Add(artifact1.code);
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.artifact1,artifact1.code));
                     }
-                    /*if (artifact2 != null)
+                    if (artifact2 != null)
                     {
-                        listeStuff.Add(artifact2.code);
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.artifact2,artifact2.code));
                     }
                     if (artifact3 != null)
                     {
-                        listeStuff.Add(artifact3.code);
-                    }*/
+                        listeStuff.Add(new Tuple<Enums.EmplacementPieceStuff, string>(Enums.EmplacementPieceStuff.artifact3,artifact3.code));
+                    }
                     break;
                 }
                 //Console.WriteLine("");
