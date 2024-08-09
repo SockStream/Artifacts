@@ -10,7 +10,7 @@ namespace Artifacts.Utilities.Network
     internal sealed class QuerySender
     {
         private static string server = "https://api.artifactsmmo.com";
-        private static string token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IlNvY2tTdHJlYW0iLCJwYXNzd29yZF9jaGFuZ2VkIjoiIn0.oXkgugB20AMqWw8c7iJovnMVwAPXKvrKTnAdspma04E";
+        private static string token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IlNvY2tTdHJlYW0iLCJwYXNzd29yZF9jaGFuZ2VkIjoiMjAyNC0wOC0wOSAwOTowMToxNy4zMjQ2ODcifQ.jMK-KCQl7YZ63Ez8j3gRFT4_Tjpc__nKpVXyB8v88lA";
         private static QuerySender instance = new QuerySender();
 
         public static QuerySender Instance

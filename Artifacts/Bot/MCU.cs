@@ -120,6 +120,8 @@ namespace Artifacts.Bot
             Personnage.Personnage phage = new Guerrier(this);
             phage.FeuillePerso = CharactersArray[3];
             ListePersonnages.Add(phage);
+            ((Guerrier)phage).rattrapage_stuff();
+
 
             Personnage.Personnage Celia = new Crafteur(this);
             Celia.FeuillePerso = CharactersArray[4];

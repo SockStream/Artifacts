@@ -135,7 +135,7 @@ namespace Artifacts.Bot.Personnage
 
         internal void Farmer_gearcrafting()
         {
-            Objet obj = mcu.ObjetList.Where(x => x.craft != null && x.craft.skill == Constantes.gearcrafting && x.craft.level <= FeuillePerso.jewelrycrafting_level).OrderByDescending(x => x.level).FirstOrDefault();
+            Objet obj = mcu.ObjetList.Where(x => x.craft != null && x.craft.skill == Constantes.gearcrafting && x.craft.level <= FeuillePerso.gearcrafting_level).OrderByDescending(x => x.level).FirstOrDefault();
             if (obj != null)
             {
                 WorkOrder wo = new WorkOrder();
@@ -149,7 +149,7 @@ namespace Artifacts.Bot.Personnage
 
         internal void Farmer_weaponcrafting()
         {
-            Objet obj = mcu.ObjetList.Where(x => x.craft != null && x.craft.skill == Constantes.weaponcrafting && x.craft.level <= FeuillePerso.jewelrycrafting_level).OrderByDescending(x => x.level).FirstOrDefault();
+            Objet obj = mcu.ObjetList.Where(x => x.craft != null && x.craft.skill == Constantes.weaponcrafting && x.craft.level <= FeuillePerso.weaponcrafting_level).OrderByDescending(x => x.level).FirstOrDefault();
             if (obj != null)
             {
                 WorkOrder wo = new WorkOrder();

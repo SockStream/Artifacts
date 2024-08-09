@@ -381,5 +381,49 @@ namespace Artifacts.Bot.Personnage
             }
             base.Vider_Inventaire(aDeposer);
         }
-    }
+        internal void rattrapage_stuff()
+        {
+            int niveauMetier = GetNiveauMetier();
+            int? palier = ListePaliers.Where(x => x <= niveauMetier).OrderByDescending(x => x).FirstOrDefault();
+            int? palier_precedent = ListePaliers.Where(x => x < palier).OrderByDescending(x => x).FirstOrDefault();
+            if (palier_precedent != 0)
+            {
+                List<Objet> List_stuff_palier = mcu.getObjetList().Where(x => listeTypesPiecesEquipements.Contains(x.type) && x.subtype != Constantes.tool && x.level == palier_precedent.Value).ToList();
+
+                foreach (Objet piece in List_stuff_palier)
+                {
+                    bool pieceCommandeeOuExiste = false;
+                    if (ExistsInInventory(piece.code))
+                    {
+                        pieceCommandeeOuExiste = true;
+                    }
+                    foreach (Inventory inventory in FeuillePerso.inventory)
+                    {
+                        if (inventory.code == piece.code)
+                        {
+                            pieceCommandeeOuExiste = true;
+                        }
+                    }
+                    if (!pieceCommandeeOuExiste)
+                    {
+                        int quantite = 1;
+                        if (piece.type == Constantes.ring)
+                        {
+                            quantite = 2;
+                        }
+                        if (piece.type == Constantes.artifact)
+                        {
+                            quantite = 3;
+                        }
+                        WorkOrder wo = new WorkOrder();
+                        wo.Quantité = quantite;
+                        wo.Code = piece.code;
+                        wo.Demandeur = this;
+                        mcu.AjouterWorkOrder(wo);
+                        WorkOrderList.Add(wo);
+                    }
+                }
+            }
+        }
+        }
 }
